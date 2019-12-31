@@ -1,0 +1,45 @@
+package com.wjs.expr.bean;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author wjs
+ * @date 2019-12-31 17:45
+ **/
+@Getter
+@Setter
+public class BaseExpr {
+
+    public String text;
+
+    public Integer startLine;
+
+    public Integer stopLine;
+
+    public Integer startCol;
+
+    public Integer stopCol;
+
+    private List<Expr> childExprList = new ArrayList<>();
+
+    public BaseExpr(String text) {
+        this.text = text;
+    }
+
+    public boolean done(){
+        return stopLine != null;
+    }
+
+    public boolean contain(BaseExpr other){
+        return this.startCol < other.startCol && this.stopCol > other.stopCol;
+    }
+
+    @Override
+    public String toString() {
+        return text.substring(startCol, stopCol);
+    }
+}
