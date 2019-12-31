@@ -1,5 +1,6 @@
 package com.wjs.expr.bean;
 
+import com.wjs.expr.exprNative.ExprNativeService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,8 @@ public class ExprExpr extends BodyExpr {
     public Integer exprStartCol;
 
     public Integer exprStopCol;
+
+    public ExprNativeService exprNativeService;
 
     public ExprExpr(String text, Integer startLine, Integer startCol, Integer exprStartCol) {
         super(text, startLine, startCol);
@@ -33,30 +36,6 @@ public class ExprExpr extends BodyExpr {
      * @return
      */
     public String getExprText(){
-        StringBuilder sb = new StringBuilder();
-        String tmp = text.substring(exprStartCol, exprStopCol);
-        Character c = null;
-        for (int i=0; i<tmp.length()-1; i++){
-            c = tmp.charAt(i);
-            if (c == '\n'){
-                sb.append(' ');
-                continue;
-            }
-            if (c == '='){
-                sb.append(c);
-                sb.append("=");
-                if (tmp.charAt(i+1) == '='){
-                    i++;
-                }
-                continue;
-            }
-            sb.append(c);
-        }
-        c = tmp.charAt(tmp.length()-1);
-        if (c != '\n'){
-            sb.append(c);
-        }
-        System.out.println(">>> "+sb.toString());
-        return sb.toString();
+        return exprNativeService.exprNative(text.substring(exprStartCol, exprStopCol));
     }
 }

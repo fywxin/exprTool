@@ -119,7 +119,7 @@ public class ExprService {
         }
 
         if (!stack.isEmpty()) {
-            throw new RuntimeException("缺失第["+(stack.get(0).getStartLine()+1)+"]行 #if 对应的 #end, 未闭合错误");
+            throw new ExprException("缺失第["+(stack.get(0).getStartLine()+1)+"]行 #if 对应的 #end, 未闭合错误");
         }
         this.tree(list);
         return list;
@@ -128,7 +128,7 @@ public class ExprService {
     private void endIfExpr(Expr expr, Integer line, int i) {
         IfExpr ifExpr = expr.ifExpr;
         if (ifExpr.getBodyStartCol() == null){
-            throw new RuntimeException("第["+(ifExpr.getStartLine()+1)+"]行 #if 缺少 #then 关键字");
+            throw new ExprException("第["+(ifExpr.getStartLine()+1)+"]行 #if 缺少 #then 关键字");
         }
         ifExpr.setStopLine(line);
         ifExpr.setBodyStopCol(i-1);
@@ -138,7 +138,7 @@ public class ExprService {
     private void endElIfExpr(Expr expr, Integer line, int i){
         ElifExpr elifExpr = expr.lastElifExpr();
         if (elifExpr.getBodyStartCol() == null){
-            throw new RuntimeException("第["+(elifExpr.getStartLine()+1)+"]行 #elif 缺少 #then 关键字");
+            throw new ExprException("第["+(elifExpr.getStartLine()+1)+"]行 #elif 缺少 #then 关键字");
         }
         elifExpr.setStopLine(line);
         elifExpr.setBodyStopCol(i-1);
@@ -152,9 +152,7 @@ public class ExprService {
         elseExpr.setStopCol(i+3);
     }
 
-
     /**
-     * TODO 修改
      * @param text
      * @param start
      * @return
@@ -183,32 +181,13 @@ public class ExprService {
         return index;
     }
 
+    /**
+     * TODO 不同场景，分词字符不一样，需要优化
+     * @param c
+     * @return
+     */
     public static boolean isSplitChar(Character c){
         return c == ' ' || c == '\n' || c == '\t' || c == ',' || c == ';' || c == '(' || c == ')' || c == '=' || c == '+';
     }
 
-    public static void main(String[] args) {
-        ExprService exprService = new ExprService();
-
-        String text = "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
-                "from hive.woe.l_activity_taskcomplete_log\n" +
-                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
-                "and activityid=30015\n" +
-                "group by ddate\n" +
-                "as e1;\n" +
-                "#if ads=sdf #then\n" +
-                "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  #if 1=1 #then dsdds #else sayhello #end\n" +
-                "#elif ds=dffff adn #then;\n" +
-                "from hive.woe.l_activity_taskcomplete_log\n" +
-                "#else\n" +
-                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
-                "and activityid=30015\n" +
-                "#end\n" +
-                "group by ddate\n" +
-                "as e2;";
-
-
-        List<Expr> list = exprService.parse(text);
-        System.out.println(list);
-    }
 }

@@ -23,6 +23,30 @@ public class ExprTest {
     }
 
     @Test
+    public void testExpr(){
+        String text = "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                "from hive.woe.l_activity_taskcomplete_log\n" +
+                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                "and activityid=30015\n" +
+                "group by ddate\n" +
+                "as e1;\n" +
+                "#if ads=sdf #then\n" +
+                "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  #if 1=1 #then dsdds #else sayhello #end\n" +
+                "#elif ds=dffff adn #then;\n" +
+                "from hive.woe.l_activity_taskcomplete_log\n" +
+                "#else\n" +
+                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                "and activityid=30015\n" +
+                "#end\n" +
+                "group by ddate\n" +
+                "as e2;";
+
+
+        List<Expr> list = exprService.parse(text);
+        System.out.println(list);
+    }
+
+    @Test
     public void test1(){
         String sql = "#if 1=1\n" +
                 "\t&& 2<1\n" +
