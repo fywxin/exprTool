@@ -1,13 +1,11 @@
 package com.wjs.expr.test;
 
+import com.wjs.expr.ExprService;
 import com.wjs.expr.ExprEvalService;
-import com.wjs.expr.ExprExprService;
 import com.wjs.expr.ExprGrammarService;
 import com.wjs.expr.bean.Expr;
 import com.wjs.expr.eval.AviatorEval;
-import com.wjs.expr.eval.NutzEval;
 import com.wjs.expr.eval.PredicateEval;
-import com.wjs.expr.eval.QLExprEval;
 import com.wjs.expr.exprNative.SqlExprNativeService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,18 +22,18 @@ import java.util.Map;
 public class ExprTest {
 
     ExprGrammarService exprGrammarService = new ExprGrammarService();
-    ExprEvalService exprEvalService = new ExprEvalService();
+    ExprService exprService = new ExprService();
     PredicateEval predicateEval = new AviatorEval();
     SqlExprNativeService sqlExprNativeService = new SqlExprNativeService();
-    ExprExprService exprExprService = new ExprExprService();
+    ExprEvalService exprEvalService = new ExprEvalService();
 
     @Before
     public void init(){
         exprGrammarService.exprNativeService = sqlExprNativeService;
-        exprEvalService.exprGrammarService = exprGrammarService;
-        exprExprService.predicateEval = predicateEval;
-        exprExprService.exprNativeService = sqlExprNativeService;
-        exprEvalService.exprExprService = exprExprService;
+        exprService.exprGrammarService = exprGrammarService;
+        exprEvalService.predicateEval = predicateEval;
+        exprEvalService.exprNativeService = sqlExprNativeService;
+        exprService.exprEvalService = exprEvalService;
     }
 
     @Test
@@ -108,7 +106,7 @@ public class ExprTest {
                 "   and activityid=30015\n" +
                 "#end;";
 
-        String rs = exprEvalService.eval(sql, new HashMap<>());
+        String rs = exprService.eval(sql, new HashMap<>());
         System.out.println(rs);
         Assert.assertTrue(("\n" +
                 "   and activityid=30015\n" +
@@ -156,7 +154,7 @@ public class ExprTest {
                         "   1.2\n" +
                         "#end;\n" +
                         "\tand activityid=30015 as e1;";
-        String rs = exprEvalService.eval(sql, params);
+        String rs = exprService.eval(sql, params);
         System.out.println(rs);
     }
 
