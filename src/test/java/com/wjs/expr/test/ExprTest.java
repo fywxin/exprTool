@@ -3,9 +3,11 @@ package com.wjs.expr.test;
 import com.wjs.expr.ExprEvalService;
 import com.wjs.expr.ExprExprService;
 import com.wjs.expr.ExprGrammarService;
-import com.wjs.expr.bean.BaseExpr;
 import com.wjs.expr.bean.Expr;
 import com.wjs.expr.eval.AviatorEval;
+import com.wjs.expr.eval.NutzEval;
+import com.wjs.expr.eval.PredicateEval;
+import com.wjs.expr.eval.QLExprEval;
 import com.wjs.expr.exprNative.SqlExprNativeService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,7 +25,7 @@ public class ExprTest {
 
     ExprGrammarService exprGrammarService = new ExprGrammarService();
     ExprEvalService exprEvalService = new ExprEvalService();
-    AviatorEval aviatorEval = new AviatorEval();
+    PredicateEval predicateEval = new AviatorEval();
     SqlExprNativeService sqlExprNativeService = new SqlExprNativeService();
     ExprExprService exprExprService = new ExprExprService();
 
@@ -31,7 +33,7 @@ public class ExprTest {
     public void init(){
         exprGrammarService.exprNativeService = sqlExprNativeService;
         exprEvalService.exprGrammarService = exprGrammarService;
-        exprExprService.predicateEval = aviatorEval;
+        exprExprService.predicateEval = predicateEval;
         exprExprService.exprNativeService = sqlExprNativeService;
         exprEvalService.exprExprService = exprExprService;
     }
@@ -62,8 +64,8 @@ public class ExprTest {
 
     @Test
     public void test1(){
-        String sql = "#if 1=1\n" +
-                "\t&& 2<1\n" +
+        String sql = "#if 'and'='1' Or(1=1)\n" +
+                "\tand '2'<'1'\n" +
                 "#then\n" +
                 "  select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
                 "  from hive.woe.l_activity_taskcomplete_log\n" +
@@ -157,5 +159,5 @@ public class ExprTest {
         String rs = exprEvalService.eval(sql, params);
         System.out.println(rs);
     }
-    
+
 }
