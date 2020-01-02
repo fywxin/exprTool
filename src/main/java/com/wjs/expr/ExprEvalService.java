@@ -25,8 +25,20 @@ public class ExprEvalService {
      * @return
      */
     public String eval(String text, Map<String, Object> params){
+        List<Expr> exprList = this.parse(text, params);
+        return eval(text, exprList);
+    }
+
+    public List<Expr> parse(String text, Map<String, Object> params){
         List<Expr> exprList = this.exprGrammarService.parse(text);
         this.attachExprParams(exprList, params);
+        return exprList;
+    }
+
+    public String eval(String text, List<Expr> exprList){
+        if (exprList.isEmpty()){
+            return text;
+        }
         StringBuilder sb = new StringBuilder(text.length());
         this.eval(text, this.exprGrammarService.root(exprList), sb, 0, text.length());
         return sb.toString();
@@ -87,7 +99,12 @@ public class ExprEvalService {
      * @return
      */
     private boolean predicate(ExprExpr exprExpr){
-        return exprExprService.eval(exprExpr);
+        try {
+            return exprExprService.eval(exprExpr);
+        }catch (Exception e){
+            log.error("表达式计算异常: ["+exprExpr.getExprText()+"].("+exprExpr.getParams()+")", e);
+            throw new ExprException(e);
+        }
     }
 
 }

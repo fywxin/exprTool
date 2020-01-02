@@ -3,6 +3,8 @@ package com.wjs.expr.eval;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import java.util.Map;
  * @author wjs
  * @date 2020-01-02 10:13
  **/
+@Slf4j
 public class AviatorEval implements PredicateEval {
 
     AviatorEvaluatorInstance aviatorEvaluatorInstance = AviatorEvaluator.getInstance();
@@ -18,6 +21,8 @@ public class AviatorEval implements PredicateEval {
     {
         aviatorEvaluatorInstance.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
         aviatorEvaluatorInstance.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, false);
+        aviatorEvaluatorInstance.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
+        //TODO 添加日期自定义方法
     }
 
     @Override

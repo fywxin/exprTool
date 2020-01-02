@@ -1,5 +1,7 @@
 package com.wjs.expr.exprNative;
 
+import com.wjs.expr.ExprException;
+
 /**
  * Sql 方言处理器
  * @author wjs
@@ -24,6 +26,9 @@ public class SqlExprNativeService implements ExprNativeService {
                 if (c == symbol){
                     symbolIndex = -1;
                     symbol = null;
+                }
+                if (c == '\n'){
+                    throw new ExprException("表达式值不支持包含换行符:["+tmp+"]");
                 }
                 sb.append(c);
                 continue;
