@@ -1,10 +1,14 @@
 package com.wjs.expr.bean;
 
-import com.wjs.expr.exprNative.ExprNativeService;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 /**
+ * 包含断言条件的表达式
+ * if - elif
+ *
  * @author wjs
  * @date 2019-12-31 20:23
  **/
@@ -16,7 +20,7 @@ public class ExprExpr extends BodyExpr {
 
     public Integer exprStopCol;
 
-    public ExprNativeService exprNativeService;
+    private Map<String, Object> params;
 
     public ExprExpr(String text, Integer startLine, Integer startCol, Integer exprStartCol) {
         super(text, startLine, startCol);
@@ -32,10 +36,9 @@ public class ExprExpr extends BodyExpr {
     }
 
     /**
-     * TODO 修复 = 与 and or
      * @return
      */
     public String getExprText(){
-        return exprNativeService.exprNative(text.substring(exprStartCol, exprStopCol));
+        return text.substring(exprStartCol, exprStopCol);
     }
 }

@@ -13,4 +13,11 @@ public interface ExprNativeService {
      * @return
      */
     String exprNative(String expr);
+
+    /**
+     * 是否分割符号
+     * @param c
+     * @return
+     */
+    boolean isSplitChar(Character c);
 }

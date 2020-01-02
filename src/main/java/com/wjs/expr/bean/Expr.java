@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * expr: IF condition=str THEN body (ELIF condition=str THEN body)* (ELSE body)? END;
+ *
  * @author wjs
  * @date 2019-12-31 17:47
  **/

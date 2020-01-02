@@ -1,27 +1,45 @@
 package com.wjs.expr;
 
-import com.googlecode.aviator.AviatorEvaluator;
 import com.wjs.expr.bean.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * 表达式执行求解器
  * @author wjs
  * @date 2019-12-31 20:05
  **/
 @Slf4j
 public class ExprEvalService {
 
-    public ExprService exprService;
+    public ExprGrammarService exprGrammarService;
 
-    public String eval(String text){
-        List<Expr> exprList = this.exprService.parse(text);
+    public ExprExprService exprExprService;
+
+    /**
+     * 入口函数，表达式解析执行
+     * @param text 表达式
+     * @param params 表达式变量值
+     * @return
+     */
+    public String eval(String text, Map<String, Object> params){
+        List<Expr> exprList = this.exprGrammarService.parse(text);
+        this.attachExprParams(exprList, params);
         StringBuilder sb = new StringBuilder(text.length());
-        this.eval(text, this.exprService.root(exprList), sb, 0, text.length());
+        this.eval(text, this.exprGrammarService.root(exprList), sb, 0, text.length());
         return sb.toString();
+    }
+
+    /**
+     * 绑定执行条件参数
+     */
+    private void attachExprParams(List<Expr> exprList, Map<String, Object> params){
+        exprList.forEach(x -> {
+            x.ifExpr.setParams(params);
+            x.elifExprList.forEach(y -> y.setParams(params));
+        });
     }
 
     private void eval(String text, List<Expr> flatExprList, StringBuilder sb, int start, int stop){
@@ -32,15 +50,18 @@ public class ExprEvalService {
         for (Expr expr : flatExprList){
             sb.append(text, start, expr.startCol);
             IfExpr ifExpr = expr.ifExpr;
-            if (eval(ifExpr)){
+            //执行If表达式
+            if (predicate(ifExpr)){
                 this.out(text, ifExpr, sb);
+            //执行elseIf表达式
             }else if(!expr.elifExprList.isEmpty()){
                 for (ElifExpr elifExpr : expr.elifExprList){
-                    if (eval(elifExpr)){
+                    if (predicate(elifExpr)){
                         this.out(text, elifExpr, sb);
                         break;
                     }
                 }
+            //如上皆不满足，则使用else值
             }else if (expr.elseExpr.isPresent()){
                 this.out(text, expr.elseExpr.get(), sb);
             }
@@ -61,15 +82,12 @@ public class ExprEvalService {
     }
 
     /**
+     * 表达式断言求值
      * @param exprExpr
      * @return
      */
-    private boolean eval(ExprExpr exprExpr){
-        Map<String, Object> env = new HashMap<String, Object>();
-
-        Boolean rs = (Boolean) AviatorEvaluator.execute(exprExpr.getExprText(), env);
-        log.info(exprExpr.getExprText()+" = "+rs);
-        return rs;
+    private boolean predicate(ExprExpr exprExpr){
+        return exprExprService.eval(exprExpr);
     }
 
 }

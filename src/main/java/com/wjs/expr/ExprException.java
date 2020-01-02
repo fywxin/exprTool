@@ -1,6 +1,7 @@
 package com.wjs.expr;
 
 /**
+ * 表达式异常
  * @author wjs
  * @date 2019-12-31 22:33
  **/

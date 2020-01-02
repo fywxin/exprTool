@@ -1,11 +1,10 @@
 package com.wjs.expr;
 
-
-
 import com.wjs.expr.bean.ElifExpr;
 import com.wjs.expr.bean.ElseExpr;
 import com.wjs.expr.bean.Expr;
 import com.wjs.expr.bean.IfExpr;
+import com.wjs.expr.exprNative.ExprNativeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,31 +12,28 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * 表达式语法解析器
  * @author wjs
  * @date 2019-12-31 17:51
  **/
-public class ExprService {
+public class ExprGrammarService {
 
+    public ExprNativeService exprNativeService;
+
+    /**
+     * 顶层根表达式列表
+     * @param list
+     * @return
+     */
     public List<Expr> root(List<Expr> list){
         return list.stream().filter(x -> x.parent == null).collect(Collectors.toList());
     }
 
-    //TODO 性能优化，减去无必要的循环
-    private void tree(List<Expr> list){
-        for (Expr expr : list){
-            List<Expr> child = list.stream().filter(x -> x.parent == expr).collect(Collectors.toList());
-            if (!child.isEmpty()){
-                expr.ifExpr.setChildExprList(child.stream().filter(x -> expr.ifExpr.contain(x)).collect(Collectors.toList()));
-                for (ElifExpr elifExpr : expr.elifExprList) {
-                    elifExpr.setChildExprList(child.stream().filter(x -> child.contains(x)).collect(Collectors.toList()));
-                }
-                if (expr.elseExpr.isPresent()){
-                    expr.elseExpr.get().setChildExprList(child.stream().filter(x -> expr.elseExpr.get().contain(x)).collect(Collectors.toList()));
-                }
-            }
-        }
-    }
-
+    /**
+     * 语法解析提取
+     * @param text
+     * @return
+     */
     public List<Expr> parse(String text) {
         Character c = null;
         String cmd = null;
@@ -45,6 +41,7 @@ public class ExprService {
 
         List<Expr> list= new ArrayList<>();
 
+        //待解析的表达式栈
         List<Expr> stack= new ArrayList<>();
         Expr expr = null;
 
@@ -60,6 +57,7 @@ public class ExprService {
                 switch (cmd){
                     case "if":
                         expr = new Expr(new IfExpr(text, line, i - 1, i + 2));
+                        //父表达式 -> 栈上最近一个未完成的表达式
                         for (int j=stack.size()-1; j>=0; j--){
                             if (!stack.get(j).isOk()){
                                 expr.parent = stack.get(j);
@@ -102,6 +100,7 @@ public class ExprService {
                         expr.setElseExpr(Optional.of(new ElseExpr(text, line, i-1)));
                         break;
                     case "end":
+                        //表达式解析完成，出栈
                         expr = stack.remove(stack.size()-1).finish(line, i+3);
                         if(expr.elseExpr.isPresent()){
                             endElse(expr, line, i);
@@ -123,6 +122,22 @@ public class ExprService {
         }
         this.tree(list);
         return list;
+    }
+
+    //TODO 性能优化，减去无必要的循环
+    private void tree(List<Expr> list){
+        for (Expr expr : list){
+            List<Expr> child = list.stream().filter(x -> x.parent == expr).collect(Collectors.toList());
+            if (!child.isEmpty()){
+                expr.ifExpr.setChildExprList(child.stream().filter(x -> expr.ifExpr.contain(x)).collect(Collectors.toList()));
+                for (ElifExpr elifExpr : expr.elifExprList) {
+                    elifExpr.setChildExprList(child.stream().filter(x -> child.contains(x)).collect(Collectors.toList()));
+                }
+                if (expr.elseExpr.isPresent()){
+                    expr.elseExpr.get().setChildExprList(child.stream().filter(x -> expr.elseExpr.get().contain(x)).collect(Collectors.toList()));
+                }
+            }
+        }
     }
 
     private void endIfExpr(Expr expr, Integer line, int i) {
@@ -157,7 +172,7 @@ public class ExprService {
      * @param start
      * @return
      */
-    public static String getWord(String text, int start){
+    public String getWord(String text, int start){
         int end = getWordEnd(text, start);
         if (start == end){
             return String.valueOf(text.charAt(start));
@@ -165,7 +180,7 @@ public class ExprService {
         return text.substring(start, end);
     }
 
-    private static Integer getWordEnd(String text, int start){
+    private Integer getWordEnd(String text, int start){
         int index = start;
         char c = text.charAt(index);
         if (isSplitChar(c)){
@@ -182,12 +197,12 @@ public class ExprService {
     }
 
     /**
-     * TODO 不同场景，分词字符不一样，需要优化
+     * 是否为分词
      * @param c
      * @return
      */
-    public static boolean isSplitChar(Character c){
-        return c == ' ' || c == '\n' || c == '\t' || c == ',' || c == ';' || c == '(' || c == ')' || c == '=' || c == '+';
+    public boolean isSplitChar(Character c){
+        return exprNativeService.isSplitChar(c);
     }
 
 }

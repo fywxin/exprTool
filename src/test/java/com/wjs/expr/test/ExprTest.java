@@ -1,12 +1,18 @@
 package com.wjs.expr.test;
 
 import com.wjs.expr.ExprEvalService;
-import com.wjs.expr.ExprService;
+import com.wjs.expr.ExprExprService;
+import com.wjs.expr.ExprGrammarService;
 import com.wjs.expr.bean.Expr;
+import com.wjs.expr.eval.AviatorEval;
+import com.wjs.expr.exprNative.SqlExprNativeService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wjs
@@ -14,12 +20,19 @@ import java.util.List;
  **/
 public class ExprTest {
 
-    ExprService exprService = new ExprService();
+    ExprGrammarService exprGrammarService = new ExprGrammarService();
     ExprEvalService exprEvalService = new ExprEvalService();
+    AviatorEval aviatorEval = new AviatorEval();
+    SqlExprNativeService sqlExprNativeService = new SqlExprNativeService();
+    ExprExprService exprExprService = new ExprExprService();
 
     @Before
     public void init(){
-        exprEvalService.exprService = exprService;
+        exprGrammarService.exprNativeService = sqlExprNativeService;
+        exprEvalService.exprGrammarService = exprGrammarService;
+        exprExprService.predicateEval = aviatorEval;
+        exprExprService.exprNativeService = sqlExprNativeService;
+        exprEvalService.exprExprService = exprExprService;
     }
 
     @Test
@@ -42,7 +55,7 @@ public class ExprTest {
                 "as e2;";
 
 
-        List<Expr> list = exprService.parse(text);
+        List<Expr> list = exprGrammarService.parse(text);
         System.out.println(list);
     }
 
@@ -69,7 +82,7 @@ public class ExprTest {
                 "  where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                 "#else\n" +
                 "   and activityid=30015\n" +
-                "#end;\n" +
+                "#end\n" +
                 "NNNNNN\n" +
                 "#if 1==1 #then\n" +
                 "  select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
@@ -92,7 +105,55 @@ public class ExprTest {
                 "   and activityid=30015\n" +
                 "#end;";
 
+        String rs = exprEvalService.eval(sql, new HashMap<>());
+        System.out.println(rs);
+        Assert.assertTrue(("\n" +
+                "   and activityid=30015\n" +
+                "\n" +
+                "NNNNNN\n" +
+                "\n" +
+                "  select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                "  from hive.woe.l_activity_taskcomplete_log\n" +
+                "\t\n" +
+                "\t\t2.1\n" +
+                "\t\t\n" +
+                "\t\t\t2.1.2\n" +
+                "\t\t\n" +
+                "\t\t2.2\n" +
+                "\t\n" +
+                "  where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                ";").equals(rs));
+    }
 
-        System.out.println(exprEvalService.eval(sql));
+    @Test
+    public void testExample(){
+        Map<String, Object> params = new HashMap<>();
+        params.put("woe", true);
+        String sql =
+                "SELECT concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                        "FROM #if woe #then hive.woe.l_activity_taskcomplete_log #else hive.boe.l_activity_taskcomplete_log #end\n" +
+                        "WHERE concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                        "#if 1=1 #then \n" +
+                        "\t1.0\n" +
+                        "\t#if 2>1 #then\n" +
+                        "\t\t2.1\n" +
+                        "\t\t#if 2<1 #then\n" +
+                        "\t\t\t2.1.1\n" +
+                        "\t\t#elif 2==2 #then\n" +
+                        "\t\t\t2.1.2\n" +
+                        "\t\t#else\n" +
+                        "\t\t\t2.1.3\n" +
+                        "\t\t#end\n" +
+                        "\t\t2.2\n" +
+                        "\t#else\n" +
+                        "\t\t333\n" +
+                        "\t#end\n" +
+                        "  \t1.1\n" +
+                        "#else\n" +
+                        "   1.2\n" +
+                        "#end;\n" +
+                        "\tand activityid=30015 as e1;";
+        String rs = exprEvalService.eval(sql, params);
+        System.out.println(rs);
     }
 }
