@@ -45,6 +45,7 @@ UNRECOGNIZED
 # 快速开始
 
 ```scala
+val params:Map[String,AnyRef]=Map("woe"->true)
 val sql = """
 SELECT concat(year,"-",month,"-",day) as ddate,count(1) num
 FROM #if woe #then hive.woe.l_activity_taskcomplete_log #else hive.boe.l_activity_taskcomplete_log #end
