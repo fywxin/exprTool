@@ -13,7 +13,7 @@ public class ElseExpr extends BodyExpr{
 
     public ElseExpr(String text, Integer startLine, Integer startCol) {
         super(text, startLine, startCol);
-        this.setBodyStartCol(startCol+5);
+        this.setBodyStartCol(startCol+ELSE.length()+1);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.wjs.expr;
 
-import com.wjs.expr.bean.ElifExpr;
-import com.wjs.expr.bean.ElseExpr;
-import com.wjs.expr.bean.Expr;
-import com.wjs.expr.bean.IfExpr;
+import com.wjs.expr.bean.*;
 import com.wjs.expr.exprNative.ExprNativeService;
 
 import java.util.ArrayList;
@@ -31,6 +28,7 @@ public class ExprGrammarService {
 
     /**
      * 语法解析提取
+     * case when then else end 支持
      * @param text
      * @return
      */
@@ -55,8 +53,8 @@ public class ExprGrammarService {
                 i++;
                 cmd = getWord(text, i).toLowerCase();
                 switch (cmd){
-                    case "if":
-                        expr = new Expr(new IfExpr(text, line, i - 1, i + 2));
+                    case BaseExpr.IF:
+                        expr = new Expr(new IfExpr(text, line, i - 1, i + BaseExpr.IF.length()));
                         //父表达式 -> 栈上最近一个未完成的表达式
                         for (int j=stack.size()-1; j>=0; j--){
                             if (!stack.get(j).isOk()){
@@ -66,30 +64,30 @@ public class ExprGrammarService {
                         }
                         stack.add(expr);
                         break;
-                    case "then":
+                    case BaseExpr.THEN:
                         expr = stack.get(stack.size()-1);
                         //if
                         if (expr.elifExprList.isEmpty()){
                             IfExpr ifExpr = expr.ifExpr;
                             ifExpr.setExprStopCol(i-1);
-                            ifExpr.setBodyStartCol(i+4);
+                            ifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
                         //elif
                         } else {
                             ElifExpr elifExpr = expr.lastElifExpr();
                             elifExpr.setExprStopCol(i-1);
-                            elifExpr.setBodyStartCol(i+4);
+                            elifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
                         }
                         break;
-                    case "elif":
+                    case BaseExpr.ELIF:
                         expr = stack.get(stack.size()-1);
                         if (expr.elifExprList.isEmpty()){
                             endIfExpr(expr, line, i);
                         } else {
                             endElIfExpr(expr, line, i);
                         }
-                        expr.addElifExpr(new ElifExpr(text, line, i-1, i+4));
+                        expr.addElifExpr(new ElifExpr(text, line, i-1, i+BaseExpr.ELIF.length()));
                         break;
-                    case "else":
+                    case BaseExpr.ELSE:
                         expr = stack.get(stack.size()-1);
                         if (expr.elifExprList.isEmpty()){
                             endIfExpr(expr, line, i);
@@ -99,9 +97,9 @@ public class ExprGrammarService {
 
                         expr.setElseExpr(Optional.of(new ElseExpr(text, line, i-1)));
                         break;
-                    case "end":
+                    case BaseExpr.END:
                         //表达式解析完成，出栈
-                        expr = stack.remove(stack.size()-1).finish(line, i+3);
+                        expr = stack.remove(stack.size()-1).finish(line, i+BaseExpr.END.length());
                         if(expr.elseExpr.isPresent()){
                             endElse(expr, line, i);
                         }else if (expr.elifExprList.isEmpty()){
@@ -164,7 +162,7 @@ public class ExprGrammarService {
         ElseExpr elseExpr = expr.elseExpr.get();
         elseExpr.setStopLine(line);
         elseExpr.setBodyStopCol(i-1);
-        elseExpr.setStopCol(i+3);
+        elseExpr.setStopCol(i+BaseExpr.END.length());
     }
 
     /**

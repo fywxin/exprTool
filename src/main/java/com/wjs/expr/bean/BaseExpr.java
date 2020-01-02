@@ -15,6 +15,12 @@ import java.util.List;
 @Setter
 public class BaseExpr {
 
+    public static final String IF = "if";
+    public static final String THEN = "then";
+    public static final String ELSE = "else";
+    public static final String ELIF = "elseif";
+    public static final String END = "end";
+
     //原始表达式语句
     public String text;
 
