@@ -121,12 +121,17 @@ public class ExprGrammarService {
                 expr = stack.remove(stack.size()-1).finish(line, i);
                 if(expr.elseExpr.isPresent()){
                     endElse(expr, line, i+1);
-                    expr.elseExpr.get().setStopCol(i);
+                    ElseExpr elseExpr = expr.elseExpr.get();
+                    elseExpr.setStopCol(i);
+                    elseExpr.autoComplete = true;
                 }else if (expr.elifExprList.isEmpty()){
                     endIfExpr(expr, line, i+1);
+                    expr.ifExpr.autoComplete = true;
                 } else{
                     endElIfExpr(expr, line, i+1);
+                    expr.lastElifExpr().autoComplete = true;
                 }
+                expr.autoComplete = true;
                 list.add(expr);
             }
         }else {

@@ -39,6 +39,9 @@ public class BaseExpr {
 
     public Integer stopCol;
 
+    //是否自动适配补充完成的
+    public boolean autoComplete = false;
+
     //嵌套子表达式
     private List<Expr> childExprList = new ArrayList<>();
 
