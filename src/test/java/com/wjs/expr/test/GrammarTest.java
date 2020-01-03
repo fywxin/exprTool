@@ -1,5 +1,6 @@
 package com.wjs.expr.test;
 
+import com.wjs.expr.ExprException;
 import com.wjs.expr.ExprGrammarService;
 import com.wjs.expr.bean.Expr;
 import com.wjs.expr.exprNative.ExprNativeService;
@@ -60,5 +61,19 @@ public class GrammarTest {
 
         List<Expr> list = exprGrammarService.parse(text, true);
         Assert.assertTrue(list.size() == 2);
+    }
+
+    @Test
+    public void testExprNotIf(){
+        String text = "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                "from hive.woe.l_activity_taskcomplete_log\n" +
+                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                "and activityid=30015\n" +
+                "group by ddate\n" +
+                "as e1;\n" +
+                "#if ads=sdf #then\n" +
+                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  1=1 #then dsdds #else sayhello #end\n";
+
+        Assert.assertThrows(ExprException.class, () -> exprGrammarService.parse(text, true));
     }
 }

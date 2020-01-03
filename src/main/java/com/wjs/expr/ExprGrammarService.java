@@ -65,20 +65,30 @@ public class ExprGrammarService {
                         stack.add(expr);
                         break;
                     case BaseExpr.THEN:
+                        this.checkIf(stack, line);
                         expr = stack.get(stack.size()-1);
                         //if
                         if (expr.elifExprList.isEmpty()){
                             IfExpr ifExpr = expr.ifExpr;
-                            ifExpr.setExprStopCol(i-1);
-                            ifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
+                            if (ifExpr.getExprStopCol() == null){
+                                ifExpr.setExprStopCol(i-1);
+                                ifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
+                            }else{
+                                throw new ExprException("第["+line+"]行的 "+BaseExpr._THEN+" 缺少匹配的 "+BaseExpr._IF);
+                            }
                         //elif
                         } else {
                             ElifExpr elifExpr = expr.lastElifExpr();
-                            elifExpr.setExprStopCol(i-1);
-                            elifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
+                            if (elifExpr.getExprStopCol() == null){
+                                elifExpr.setExprStopCol(i-1);
+                                elifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
+                            }else{
+                                throw new ExprException("第["+line+"]行的 "+BaseExpr._THEN+" 缺少匹配的 "+BaseExpr._ELIF);
+                            }
                         }
                         break;
                     case BaseExpr.ELIF:
+                        this.checkIf(stack, line);
                         expr = stack.get(stack.size()-1);
                         if (expr.elifExprList.isEmpty()){
                             endIfExpr(expr, line, i);
@@ -88,6 +98,7 @@ public class ExprGrammarService {
                         expr.addElifExpr(new ElifExpr(text, line, i-1, i+BaseExpr.ELIF.length()));
                         break;
                     case BaseExpr.ELSE:
+                        this.checkIf(stack, line);
                         expr = stack.get(stack.size()-1);
                         if (expr.elifExprList.isEmpty()){
                             endIfExpr(expr, line, i);
@@ -98,6 +109,7 @@ public class ExprGrammarService {
                         expr.setElseExpr(Optional.of(new ElseExpr(text, line, i-1)));
                         break;
                     case BaseExpr.END:
+                        this.checkIf(stack, line);
                         //表达式解析完成，出栈
                         expr = stack.remove(stack.size()-1).finish(line, i+BaseExpr.END.length());
                         if(expr.elseExpr.isPresent()){
@@ -156,6 +168,12 @@ public class ExprGrammarService {
                     expr.elseExpr.get().setChildExprList(child.stream().filter(x -> expr.elseExpr.get().contain(x)).collect(Collectors.toList()));
                 }
             }
+        }
+    }
+
+    private void checkIf(List<Expr> stack, int line){
+        if (stack.isEmpty() || stack.get(stack.size()-1).ifExpr == null) {
+            throw new ExprException("第["+line+"]行之上, 缺少 "+BaseExpr._IF+" 关键字");
         }
     }
 
