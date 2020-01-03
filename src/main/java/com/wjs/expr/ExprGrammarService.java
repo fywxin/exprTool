@@ -32,7 +32,7 @@ public class ExprGrammarService {
      * @param text
      * @return
      */
-    public List<Expr> parse(String text) {
+    public List<Expr> parse(String text, boolean autoComplete) {
         Character c = null;
         String cmd = null;
         int line = 0;
@@ -115,8 +115,24 @@ public class ExprGrammarService {
             }
         }
 
-        if (!stack.isEmpty()) {
-            throw new ExprException("缺失第["+(stack.get(0).getStartLine()+1)+"]行 #if 对应的 #end, 未闭合错误");
+        if (autoComplete){
+            while (!stack.isEmpty()){
+                int i = text.length();
+                expr = stack.remove(stack.size()-1).finish(line, i);
+                if(expr.elseExpr.isPresent()){
+                    endElse(expr, line, i+1);
+                    expr.elseExpr.get().setStopCol(i);
+                }else if (expr.elifExprList.isEmpty()){
+                    endIfExpr(expr, line, i+1);
+                } else{
+                    endElIfExpr(expr, line, i+1);
+                }
+                list.add(expr);
+            }
+        }else {
+            if (!stack.isEmpty()) {
+                throw new ExprException("缺失第[" + (stack.get(0).getStartLine() + 1) + "]行 #if 对应的 #end, 未闭合错误");
+            }
         }
         this.tree(list);
         return list;

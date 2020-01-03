@@ -30,7 +30,7 @@ public class ExprService {
     }
 
     public List<Expr> parse(String text, Map<String, Object> params){
-        List<Expr> exprList = this.exprGrammarService.parse(text);
+        List<Expr> exprList = this.exprGrammarService.parse(text, true);
         this.attachExprParams(exprList, params);
         return exprList;
     }
@@ -62,19 +62,24 @@ public class ExprService {
         for (Expr expr : flatExprList){
             sb.append(text, start, expr.startCol);
             IfExpr ifExpr = expr.ifExpr;
+
+            boolean match = false;
             //执行If表达式
             if (predicate(ifExpr)){
                 this.out(text, ifExpr, sb);
+                match = true;
             //执行elseIf表达式
             }else if(!expr.elifExprList.isEmpty()){
                 for (ElifExpr elifExpr : expr.elifExprList){
                     if (predicate(elifExpr)){
                         this.out(text, elifExpr, sb);
-                        break;
+                        match = true;
                     }
                 }
             //如上皆不满足，则使用else值
-            }else if (expr.elseExpr.isPresent()){
+            }
+
+            if (!match && expr.elseExpr.isPresent()){
                 this.out(text, expr.elseExpr.get(), sb);
             }
             start = expr.stopCol;

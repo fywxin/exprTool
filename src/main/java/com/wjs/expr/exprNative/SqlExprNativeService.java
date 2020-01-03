@@ -56,9 +56,8 @@ public class SqlExprNativeService implements ExprNativeService {
             }
             if (c == '='){
                 sb.append(c);
-                sb.append("=");
-                if (n != null && n =='='){
-                    i++;
+                if (!(n == null || n == '=' || p==null || p == '>' || p=='<' || p == '=' || p == '!')){
+                    sb.append("=");
                 }
                 continue;
             }

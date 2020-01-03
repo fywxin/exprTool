@@ -1,18 +1,17 @@
 package com.wjs.expr.test;
 
-import com.wjs.expr.ExprService;
 import com.wjs.expr.ExprEvalService;
 import com.wjs.expr.ExprGrammarService;
-import com.wjs.expr.bean.Expr;
+import com.wjs.expr.ExprService;
 import com.wjs.expr.eval.AviatorEval;
 import com.wjs.expr.eval.PredicateEval;
+import com.wjs.expr.exprNative.ExprNativeService;
 import com.wjs.expr.exprNative.SqlExprNativeService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,41 +23,18 @@ public class ExprTest {
     ExprGrammarService exprGrammarService = new ExprGrammarService();
     ExprService exprService = new ExprService();
     PredicateEval predicateEval = new AviatorEval();
-    SqlExprNativeService sqlExprNativeService = new SqlExprNativeService();
+    ExprNativeService exprNativeService = new SqlExprNativeService();
     ExprEvalService exprEvalService = new ExprEvalService();
 
     @Before
     public void init(){
-        exprGrammarService.exprNativeService = sqlExprNativeService;
+        exprGrammarService.exprNativeService = exprNativeService;
         exprService.exprGrammarService = exprGrammarService;
         exprEvalService.predicateEval = predicateEval;
-        exprEvalService.exprNativeService = sqlExprNativeService;
+        exprEvalService.exprNativeService = exprNativeService;
         exprService.exprEvalService = exprEvalService;
     }
 
-    @Test
-    public void testExpr(){
-        String text = "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
-                "from hive.woe.l_activity_taskcomplete_log\n" +
-                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
-                "and activityid=30015\n" +
-                "group by ddate\n" +
-                "as e1;\n" +
-                "#if ads=sdf #then\n" +
-                "select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  #if 1=1 #then dsdds #else sayhello #end\n" +
-                "#elif ds=dffff adn #then;\n" +
-                "from hive.woe.l_activity_taskcomplete_log\n" +
-                "#else\n" +
-                "where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
-                "and activityid=30015\n" +
-                "#end\n" +
-                "group by ddate\n" +
-                "as e2;";
-
-
-        List<Expr> list = exprGrammarService.parse(text);
-        System.out.println(list);
-    }
 
     @Test
     public void test1(){
@@ -140,20 +116,51 @@ public class ExprTest {
                         "\t\t2.1\n" +
                         "\t\t#if 2<1 #then\n" +
                         "\t\t\t2.1.1\n" +
-                        "\t\t#elif 2==2 #then\n" +
+                        "\t\t#elif 2!=2 #then\n" +
                         "\t\t\t2.1.2\n" +
-                        "\t\t#else\n" +
+                        "\t\t#elif 2>2 #then\n" +
                         "\t\t\t2.1.3\n" +
+                        "\t\t#else\n" +
+                        "\t\t\t2.1.4\n" +
+                        "\t\t\t#if 1==1 #then 2.1.4.1 #else 2.1.4.2 #end 2.1.4.3 #if 1>1 #then 2.1.4.4 #else 2.1.4.5 #end\n" +
+                        "\t\t\t2.1.5\n" +
                         "\t\t#end\n" +
                         "\t\t2.2\n" +
                         "\t#else\n" +
-                        "\t\t333\n" +
+                        "\t\t2.3\n" +
                         "\t#end\n" +
                         "  \t1.1\n" +
                         "#else\n" +
                         "   1.2\n" +
                         "#end;\n" +
                         "\tand activityid=30015 as e1;";
+        System.out.println(sql);
+        String rs = exprService.eval(sql, params);
+        System.out.println(rs);
+    }
+
+    @Test
+    public void testAutoComplete() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("woe", true);
+        String sql =
+                "SELECT concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                        "FROM #if woe #then hive.woe.l_activity_taskcomplete_log #else hive.boe.l_activity_taskcomplete_log #end\n" +
+                        "WHERE concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                        "#if 1=1 #then \n" +
+                        "\t1.0\n" +
+                        "\t#if 2>1 #then\n" +
+                        "\t\t2.1\n" +
+                        "\t\t#if 2<1 #then\n" +
+                        "\t\t\t2.1.1\n" +
+                        "\t\t#elif 2!=2 #then\n" +
+                        "\t\t\t2.1.2\n" +
+                        "\t\t#elif 2>2 #then\n" +
+                        "\t\t\t2.1.3\n" +
+                        "\t\t#else\n" +
+                        "\t\t\t2.1.4\n" +
+                        "\t\t\t#if 1==1 #then 2.1.4.1 #else 2.1.4.2 #end 2.1.4.3 #if 1>1 #then 2.1.4.4";
+        System.out.println(sql);
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
     }

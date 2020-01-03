@@ -49,7 +49,7 @@ public class BaseExpr {
      * @return
      */
     public boolean contain(BaseExpr other){
-        return this.startCol < other.startCol && this.stopCol > other.stopCol;
+        return this.startCol <= other.startCol && this.stopCol >= other.stopCol;
     }
 
     @Override
