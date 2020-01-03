@@ -3,7 +3,6 @@ package com.wjs.expr.eval;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
-import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

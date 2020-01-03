@@ -49,7 +49,7 @@ public class ExprGrammarService {
                 line++;
                 continue;
             }
-            if (c == '#'){
+            if (c == BaseExpr.GRAMMAR){
                 i++;
                 cmd = getWord(text, i).toLowerCase();
                 switch (cmd){
@@ -131,7 +131,7 @@ public class ExprGrammarService {
             }
         }else {
             if (!stack.isEmpty()) {
-                throw new ExprException("缺失第[" + (stack.get(0).getStartLine() + 1) + "]行 #if 对应的 #end, 未闭合错误");
+                throw new ExprException("缺失第[" + (stack.get(0).getStartLine() + 1) + "]行 "+BaseExpr._IF+" 对应的 "+BaseExpr._END+", 未闭合错误");
             }
         }
         this.tree(list);
@@ -157,7 +157,7 @@ public class ExprGrammarService {
     private void endIfExpr(Expr expr, Integer line, int i) {
         IfExpr ifExpr = expr.ifExpr;
         if (ifExpr.getBodyStartCol() == null){
-            throw new ExprException("第["+(ifExpr.getStartLine()+1)+"]行 #if 缺少 #then 关键字");
+            throw new ExprException("第["+(ifExpr.getStartLine()+1)+"]行 "+BaseExpr._IF+" 缺少 "+BaseExpr._THEN+" 关键字");
         }
         ifExpr.setStopLine(line);
         ifExpr.setBodyStopCol(i-1);
@@ -167,7 +167,7 @@ public class ExprGrammarService {
     private void endElIfExpr(Expr expr, Integer line, int i){
         ElifExpr elifExpr = expr.lastElifExpr();
         if (elifExpr.getBodyStartCol() == null){
-            throw new ExprException("第["+(elifExpr.getStartLine()+1)+"]行 #elif 缺少 #then 关键字");
+            throw new ExprException("第["+(elifExpr.getStartLine()+1)+"]行 "+BaseExpr._ELIF+" 缺少 "+BaseExpr._THEN+" 关键字");
         }
         elifExpr.setStopLine(line);
         elifExpr.setBodyStopCol(i-1);

@@ -14,12 +14,19 @@ import java.util.List;
 @Getter
 @Setter
 public class BaseExpr {
+    public static final Character GRAMMAR = '#';
 
     public static final String IF = "if";
     public static final String THEN = "then";
     public static final String ELSE = "else";
     public static final String ELIF = "elif";
     public static final String END = "end";
+
+    public static final String _IF = GRAMMAR+"if";
+    public static final String _THEN = GRAMMAR+"then";
+    public static final String _ELSE = GRAMMAR+"else";
+    public static final String _ELIF = GRAMMAR+"elif";
+    public static final String _END = GRAMMAR+"end";
 
     //原始表达式语句
     public String text;

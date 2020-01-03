@@ -151,7 +151,7 @@ public class ExprTest {
                         "\t1.0\n" +
                         "\t#if 2>1 #then\n" +
                         "\t\t2.1\n" +
-                        "\t\t#if 2<1 #then\n" +
+                        "\t\t#IF 2<1 #then\n" +
                         "\t\t\t2.1.1\n" +
                         "\t\t#elif 2!=2 #then\n" +
                         "\t\t\t2.1.2\n" +
