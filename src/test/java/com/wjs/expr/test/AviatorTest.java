@@ -1,15 +1,13 @@
 package com.wjs.expr.test;
 
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.wjs.expr.ExprException;
+import com.wjs.expr.eval.AviatorEval;
 import com.wjs.expr.exprNative.SqlExprNativeService;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,30 +22,9 @@ import java.util.Map;
  **/
 public class AviatorTest {
 
-    AviatorEvaluatorInstance aviatorEvaluatorInstance = AviatorEvaluator.getInstance();
+    AviatorEvaluatorInstance aviatorEvaluatorInstance = AviatorEval.aviatorEvaluatorInstance;
     SqlExprNativeService sqlExprNativeService = new SqlExprNativeService();
 
-    {
-        aviatorEvaluatorInstance.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
-        aviatorEvaluatorInstance.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, false);
-        try {
-            aviatorEvaluatorInstance.addStaticFunctions("StringUtils", StringUtils.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-//        aviatorEvaluatorInstance.addOpFunction(OperatorType.AND, new AbstractFunction() {
-//
-//            @Override
-//            public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-//                return new AviatorString(arg1.getValue(env).toString() + arg2.getValue(env).toString());
-//            }
-//
-//            @Override
-//            public String getName() {
-//                return "and";
-//            }
-//        });
-    }
 
     private void run(String... exprList){
         for (String expr : exprList){
@@ -110,8 +87,22 @@ public class AviatorTest {
     }
 
     @Test
-    public void testUserFunction(){
+    public void testUserTestFunc(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("test", "test");
+        run(map, "test(ls)",
+                "test(zs) && 1==1",
+                "TEST(zw)",
+                "test('33')",
+                "test(zs, '33')"
+                );
+    }
 
+    @Test
+    public void testColValueFunc(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("test", "test");
+        run(map, "colValue(e1, 'id', 3)");
     }
 
     @Test

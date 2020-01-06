@@ -3,6 +3,8 @@ package com.wjs.expr.eval;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
+import com.wjs.expr.func.ColValueFunc;
+import com.wjs.expr.func.TestFunc;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -15,11 +17,13 @@ import java.util.Map;
 @Slf4j
 public class AviatorEval implements PredicateEval {
 
-    AviatorEvaluatorInstance aviatorEvaluatorInstance = AviatorEvaluator.getInstance();
+    public static AviatorEvaluatorInstance aviatorEvaluatorInstance = AviatorEvaluator.getInstance();
 
-    {
+    static {
         aviatorEvaluatorInstance.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
         aviatorEvaluatorInstance.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, false);
+        aviatorEvaluatorInstance.addFunction(new TestFunc());
+        aviatorEvaluatorInstance.addFunction(new ColValueFunc());
         //TODO 添加日期自定义方法
     }
 
