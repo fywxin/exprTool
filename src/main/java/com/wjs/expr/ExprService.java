@@ -1,6 +1,7 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
+import com.wjs.expr.common.Tuple2;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -25,36 +26,39 @@ public class ExprService {
      * @return
      */
     public String eval(String text, Map<String, Object> params){
-        List<Expr> exprList = this.parse(text, params);
-        return eval(text, exprList);
+        Tuple2<List<Expr>, List<FuncExpr>> tuple2 = this.parse(text, params);
+        return eval(text, tuple2);
     }
 
-    public List<Expr> parse(String text, Map<String, Object> params){
-        List<Expr> exprList = this.exprGrammarService.parse(text, true);
-        this.attachExprParams(exprList, params);
-        return exprList;
+    public Tuple2<List<Expr>, List<FuncExpr>> parse(String text, Map<String, Object> params){
+        Tuple2<List<Expr>, List<FuncExpr>> tuple2 = this.exprGrammarService.parse(text, true);
+        this.attachExprParams(tuple2, params);
+        return tuple2;
     }
 
-    public String eval(String text, List<Expr> exprList){
-        if (exprList.isEmpty()){
-            return text;
+    public String eval(String text, Tuple2<List<Expr>, List<FuncExpr>> tuple2){
+        if (tuple2.getFirst().isEmpty()){
+            return evalFuncExpr(text, tuple2.getSecond());
         }
         StringBuilder sb = new StringBuilder(text.length());
-        this.eval(text, this.exprGrammarService.root(exprList), sb, 0, text.length());
+        this.eval(text, this.exprGrammarService.root(tuple2.getFirst()), tuple2.getSecond(), sb, 0, text.length());
         return sb.toString();
     }
+
+
 
     /**
      * 绑定执行条件参数
      */
-    private void attachExprParams(List<Expr> exprList, Map<String, Object> params){
-        exprList.forEach(x -> {
+    private void attachExprParams(Tuple2<List<Expr>, List<FuncExpr>> tuple2, Map<String, Object> params){
+        tuple2.getFirst().forEach(x -> {
             x.ifExpr.setParams(params);
             x.elifExprList.forEach(y -> y.setParams(params));
         });
+        tuple2.getSecond().forEach(x -> x.setParams(params));
     }
 
-    private void eval(String text, List<Expr> flatExprList, StringBuilder sb, int start, int stop){
+    private void eval(String text, List<Expr> flatExprList, List<FuncExpr> funcExprList, StringBuilder sb, int start, int stop){
         if (flatExprList.isEmpty()){
             sb.append(text);
             return ;
@@ -66,13 +70,13 @@ public class ExprService {
             boolean match = false;
             //执行If表达式
             if (predicate(ifExpr)){
-                this.out(text, ifExpr, sb);
+                this.out(text, ifExpr, funcExprList, sb);
                 match = true;
             //执行elseIf表达式
             }else if(!expr.elifExprList.isEmpty()){
                 for (ElifExpr elifExpr : expr.elifExprList){
                     if (predicate(elifExpr)){
-                        this.out(text, elifExpr, sb);
+                        this.out(text, elifExpr, funcExprList, sb);
                         match = true;
                     }
                 }
@@ -80,7 +84,7 @@ public class ExprService {
             }
 
             if (!match && expr.elseExpr.isPresent()){
-                this.out(text, expr.elseExpr.get(), sb);
+                this.out(text, expr.elseExpr.get(), funcExprList, sb);
             }
             start = expr.stopCol;
         }
@@ -89,13 +93,17 @@ public class ExprService {
         }
     }
 
-    private void out(String text, BodyExpr bodyExpr, StringBuilder sb){
+    private void out(String text, BodyExpr bodyExpr, List<FuncExpr> funcExprList,StringBuilder sb){
         List<Expr> child = bodyExpr.getChildExprList();
         if (child.isEmpty()){
             sb.append(text, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
         }else{
-            eval(text, child, sb, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+            eval(text, child, funcExprList, sb, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
         }
+    }
+
+    public String evalFuncExpr(String text, List<FuncExpr> funcExprList){
+        return null;
     }
 
     /**

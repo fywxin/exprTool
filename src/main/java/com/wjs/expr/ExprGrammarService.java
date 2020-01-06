@@ -1,6 +1,7 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
+import com.wjs.expr.common.Tuple2;
 import com.wjs.expr.exprNative.ExprNativeService;
 
 import java.util.ArrayList;
@@ -32,10 +33,12 @@ public class ExprGrammarService {
      * @param text
      * @return
      */
-    public List<Expr> parse(String text, boolean autoComplete) {
+    public Tuple2<List<Expr>, List<FuncExpr>> parse(String text, boolean autoComplete) {
         Character c = null;
         String cmd = null;
         int line = 0;
+
+        List<FuncExpr> funcExprList = new ArrayList<>();
 
         List<Expr> list= new ArrayList<>();
 
@@ -122,6 +125,32 @@ public class ExprGrammarService {
                         list.add(expr);
                         break;
                     default:
+                        //自定义函数
+                        if (FuncExpr.support(cmd)){
+                            int j = i+cmd.length()+1;
+                            while (text.charAt(j) == ' '){
+                                j++;
+                            }
+                            if (text.charAt(j) == '('){
+                                int stopLine = line;
+                                int loop=1;
+                                while (loop > 0){
+                                    j++;
+                                    Character cc = text.charAt(j);
+                                    if (cc == '('){
+                                        loop++;
+                                    }
+                                    if (cc == ')'){
+                                        loop--;
+                                    }
+                                    if (cc == '\n'){
+                                        stopLine++;
+                                    }
+                                }
+                                funcExprList.add(new FuncExpr(text, line, stopLine, i-1, j));
+                                i = j;
+                            }
+                        }
                         break;
                 }
             }
@@ -152,7 +181,7 @@ public class ExprGrammarService {
             }
         }
         this.tree(list);
-        return list;
+        return new Tuple2<>(list, funcExprList);
     }
 
     //TODO 性能优化，减去无必要的循环
