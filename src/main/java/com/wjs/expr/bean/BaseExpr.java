@@ -22,11 +22,11 @@ public class BaseExpr {
     public static final String ELIF = "elif";
     public static final String END = "end";
 
-    public static final String _IF = GRAMMAR+"if";
-    public static final String _THEN = GRAMMAR+"then";
-    public static final String _ELSE = GRAMMAR+"else";
-    public static final String _ELIF = GRAMMAR+"elif";
-    public static final String _END = GRAMMAR+"end";
+    public static final String _IF = GRAMMAR + IF;
+    public static final String _THEN = GRAMMAR + THEN;
+    public static final String _ELSE = GRAMMAR + ELSE;
+    public static final String _ELIF = GRAMMAR + ELIF;
+    public static final String _END = GRAMMAR + END;
 
     //原始表达式语句
     public String text;

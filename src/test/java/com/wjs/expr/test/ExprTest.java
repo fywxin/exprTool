@@ -165,4 +165,23 @@ public class ExprTest {
         System.out.println(rs);
     }
 
+    @Test
+    public void test3(){
+        String sql ="var b=0,a=0;\n" +
+                "\n" +
+                "#if b=0 #then\n" +
+                "SELECT uid, #if b=0 #then ltid, #elif b>=2 #then citylvl, #else kid, #end level from mysql.inf.if_user_basic_u WHERE uid = 12807099 as ceshi1;\n" +
+                "SELECT * FROM mysql.inf.conf_mf_source LIMIT 10 as e4;\n" +
+                "#end\n" +
+                "\n" +
+                "\n" +
+                "#if b>0 #then \n" +
+                "select * from mysql.inf.conf_mf_source LIMIT 10 as e5;\n" +
+                "#end";
+        Map<String, Object> map = new HashMap<>();
+        map.put("b", 0);
+        map.put("a", 0);
+        String rs = exprService.eval(sql, map);
+        System.out.println(rs);
+    }
 }
