@@ -6,6 +6,7 @@ import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
 import com.wjs.expr.ExprException;
+import com.wjs.expr.bean.BaseExpr;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -34,6 +35,6 @@ public class TestFunc extends AbstractFunction {
 
     @Override
     public String getName() {
-        return "test";
+        return BaseExpr.GRAMMAR + "test";
     }
 }

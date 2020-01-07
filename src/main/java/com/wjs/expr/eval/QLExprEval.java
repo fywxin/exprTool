@@ -13,7 +13,7 @@ import java.util.Map;
  * @date 2020-01-02 14:33
  **/
 @Slf4j
-public class QLExprEval implements PredicateEval {
+public class QLExprEval implements ExprEval {
 
     ExpressRunner runner = new ExpressRunner();
 
@@ -27,5 +27,10 @@ public class QLExprEval implements PredicateEval {
             log.error("表达式["+expr+"]执行异常", e);
             throw new ExprException(e);
         }
+    }
+
+    @Override
+    public Object call(String expr, Map<String, Object> params) {
+        return null;
     }
 }

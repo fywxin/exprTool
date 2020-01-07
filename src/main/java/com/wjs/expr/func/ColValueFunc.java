@@ -3,6 +3,7 @@ package com.wjs.expr.func;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.*;
 import com.wjs.expr.ExprException;
+import com.wjs.expr.bean.BaseExpr;
 
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class ColValueFunc extends AbstractFunction {
 
     @Override
     public String getName() {
-        return "colValue";
+        return BaseExpr.GRAMMAR + "colValue";
     }
 
 

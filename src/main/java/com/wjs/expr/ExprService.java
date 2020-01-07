@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 表达式执行求解器
@@ -37,15 +38,13 @@ public class ExprService {
     }
 
     public String eval(String text, Tuple2<List<Expr>, List<FuncExpr>> tuple2){
-        if (tuple2.getFirst().isEmpty()){
-            return evalFuncExpr(text, tuple2.getSecond());
+        if (tuple2.getSecond().isEmpty() && tuple2.getFirst().isEmpty()){
+            return text;
         }
         StringBuilder sb = new StringBuilder(text.length());
-        this.eval(text, this.exprGrammarService.root(tuple2.getFirst()), tuple2.getSecond(), sb, 0, text.length());
+        this.evalExpr(text, this.exprGrammarService.root(tuple2.getFirst()), tuple2.getSecond(), sb, 0, text.length());
         return sb.toString();
     }
-
-
 
     /**
      * 绑定执行条件参数
@@ -58,13 +57,13 @@ public class ExprService {
         tuple2.getSecond().forEach(x -> x.setParams(params));
     }
 
-    private void eval(String text, List<Expr> flatExprList, List<FuncExpr> funcExprList, StringBuilder sb, int start, int stop){
-        if (flatExprList.isEmpty()){
-            sb.append(text);
-            return ;
-        }
+    private void evalExpr(String text, List<Expr> flatExprList, List<FuncExpr> funcExprList, StringBuilder sb, int start, int stop){
+//        if (flatExprList.isEmpty()){
+//            sb.append(text);
+//            return ;
+//        }
         for (Expr expr : flatExprList){
-            sb.append(text, start, expr.startCol);
+            evalFunc(text, funcExprList,start, expr.startCol, sb);
             IfExpr ifExpr = expr.ifExpr;
 
             boolean match = false;
@@ -89,21 +88,36 @@ public class ExprService {
             start = expr.stopCol;
         }
         if (start < stop){
-            sb.append(text, start, stop);
+            //sb.append(text, start, stop);
+            evalFunc(text, funcExprList,start, stop, sb);
         }
     }
 
     private void out(String text, BodyExpr bodyExpr, List<FuncExpr> funcExprList,StringBuilder sb){
         List<Expr> child = bodyExpr.getChildExprList();
         if (child.isEmpty()){
-            sb.append(text, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+            //sb.append(text, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+            evalFunc(text, funcExprList, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol, sb);
         }else{
-            eval(text, child, funcExprList, sb, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+            evalExpr(text, child, funcExprList, sb, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
         }
     }
 
-    public String evalFuncExpr(String text, List<FuncExpr> funcExprList){
-        return null;
+    public void evalFunc(String text, List<FuncExpr> funcExprList, int startCol, int stopCol, StringBuilder sb){
+        List<FuncExpr> innerFuncExprList = funcExprList.stream().filter(x -> x.startCol >= startCol && x.stopCol <= stopCol).collect(Collectors.toList());
+        if (innerFuncExprList.isEmpty()){
+            sb.append(text, startCol, stopCol);
+            return ;
+        }
+        int start = startCol;
+        for (FuncExpr funcExpr : innerFuncExprList){
+            sb.append(text, start, funcExpr.startCol);
+            sb.append(this.exprEvalService.eval(funcExpr));
+            start = funcExpr.stopCol;
+        }
+        if (start < stopCol){
+            sb.append(text, start, stopCol);
+        }
     }
 
     /**

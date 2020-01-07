@@ -1,5 +1,6 @@
 package com.wjs.expr.bean;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +22,7 @@ public class FuncExpr extends BaseExpr {
     private Map<String, Object> params;
 
     //是否稳幂等, 不随执行次数与上线文而改变
-    public boolean idempotent = true;
+    public boolean idempotent = false;
 
     public FuncExpr(String text) {
         super(text);
@@ -35,7 +36,15 @@ public class FuncExpr extends BaseExpr {
         this.stopCol = stopCol;
     }
 
+    public String getFuncText(){
+        return text.substring(startCol, stopCol);
+    }
+
     public static boolean support(String funcName) {
         return funcSet.contains(funcName);
+    }
+
+    public static void add(AbstractFunction func) {
+        funcSet.add(func.getName());
     }
 }

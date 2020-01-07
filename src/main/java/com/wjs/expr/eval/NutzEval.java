@@ -13,11 +13,16 @@ import org.nutz.lang.util.SimpleContext;
  * @author wjs
  * @date 2020-01-02 14:18
  **/
-public class NutzEval implements PredicateEval {
+public class NutzEval implements ExprEval {
 
     @Override
     public boolean eval(String expr, Map<String, Object> params) {
         Context context = new SimpleContext(params);
         return (Boolean) El.eval(context, expr);
+    }
+
+    @Override
+    public Object call(String expr, Map<String, Object> params) {
+        return null;
     }
 }

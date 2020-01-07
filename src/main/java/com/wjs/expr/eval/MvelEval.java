@@ -9,7 +9,7 @@ import java.util.Map;
  * @author wjs
  * @date 2020-01-02 14:39
  **/
-public class MvelEval implements PredicateEval{
+public class MvelEval implements ExprEval {
 
     @Override
     public boolean eval(String expr, Map<String, Object> params) {
@@ -17,5 +17,10 @@ public class MvelEval implements PredicateEval{
          Object rs = TemplateRuntime.eval(expr, params);
         System.out.println(rs);
         return (Boolean)rs;
+    }
+
+    @Override
+    public Object call(String expr, Map<String, Object> params) {
+        return null;
     }
 }

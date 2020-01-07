@@ -7,7 +7,9 @@ import java.util.Map;
  * @author wjs
  * @date 2020-01-02 10:08
  **/
-public interface PredicateEval {
+public interface ExprEval {
 
     boolean eval(String expr, Map<String, Object> params);
+
+    Object call(String expr, Map<String, Object> params);
 }

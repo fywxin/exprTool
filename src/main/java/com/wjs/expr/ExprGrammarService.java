@@ -38,9 +38,8 @@ public class ExprGrammarService {
         String cmd = null;
         int line = 0;
 
-        List<FuncExpr> funcExprList = new ArrayList<>();
-
         List<Expr> list= new ArrayList<>();
+        List<FuncExpr> funcExprList = new ArrayList<>();
 
         //待解析的表达式栈
         List<Expr> stack= new ArrayList<>();
@@ -125,9 +124,9 @@ public class ExprGrammarService {
                         list.add(expr);
                         break;
                     default:
-                        //自定义函数
-                        if (FuncExpr.support(cmd)){
-                            int j = i+cmd.length()+1;
+                        //自定义函数 -> 函数嵌套
+                        if (FuncExpr.support(BaseExpr.GRAMMAR + cmd)){
+                            int j = i+cmd.length();
                             while (text.charAt(j) == ' '){
                                 j++;
                             }
@@ -147,7 +146,7 @@ public class ExprGrammarService {
                                         stopLine++;
                                     }
                                 }
-                                funcExprList.add(new FuncExpr(text, line, stopLine, i-1, j));
+                                funcExprList.add(new FuncExpr(text, line, stopLine, i-1, j+1));
                                 i = j;
                             }
                         }

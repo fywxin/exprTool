@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 public class BaseExpr {
-    public static final Character GRAMMAR = '#';
+    public static final Character GRAMMAR = '$';
 
     public static final String IF = "if";
     public static final String THEN = "then";

@@ -90,11 +90,11 @@ public class AviatorTest {
     public void testUserTestFunc(){
         Map<String, Object> map = new HashMap<>();
         map.put("test", "test");
-        run(map, "test(ls)",
-                "test(zs) && 1==1",
-                "TEST(zw)",
-                "test('33')",
-                "test(zs, '33')"
+        run(map, "$test(ls)",
+                "$test(zs) && 1==1",
+                "$TEST(zw)",
+                "$test('33')",
+                "$test(zs, '33')"
                 );
     }
 
@@ -102,7 +102,14 @@ public class AviatorTest {
     public void testColValueFunc(){
         Map<String, Object> map = new HashMap<>();
         map.put("test", "test");
-        run(map, "colValue(e1, 'id', 3)");
+        run(map, "$colValue(e1, 'id', 3)");
+    }
+
+    @Test
+    public void testLoopFunc(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("test", "test");
+        run(map, "$colValue(e1, $str('id'), 3)");
     }
 
     @Test
