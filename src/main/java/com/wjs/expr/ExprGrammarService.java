@@ -35,6 +35,7 @@ public class ExprGrammarService {
      */
     public Tuple2<List<Expr>, List<FuncExpr>> parse(String text, boolean autoComplete) {
         Character c = null;
+        String frame = null;
         String cmd = null;
         int line = 0;
 
@@ -53,7 +54,8 @@ public class ExprGrammarService {
             }
             if (c == BaseExpr.GRAMMAR){
                 i++;
-                cmd = getWord(text, i).toLowerCase();
+                frame = getWord(text, i);
+                cmd = frame.toLowerCase();
                 switch (cmd){
                     case BaseExpr.IF:
                         expr = new Expr(new IfExpr(text, line, i - 1, i + BaseExpr.IF.length()));
@@ -125,8 +127,8 @@ public class ExprGrammarService {
                         break;
                     default:
                         //自定义函数 -> 函数嵌套
-                        if (FuncExpr.support(BaseExpr.GRAMMAR + cmd)){
-                            int j = i+cmd.length();
+                        if (FuncExpr.support(BaseExpr.GRAMMAR + frame)){
+                            int j = i + frame.length();
                             while (text.charAt(j) == ' '){
                                 j++;
                             }
