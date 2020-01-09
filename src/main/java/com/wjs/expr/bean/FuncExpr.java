@@ -1,11 +1,10 @@
 package com.wjs.expr.bean;
 
-import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.wjs.expr.ExprFunction;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,11 +14,9 @@ import java.util.Set;
  **/
 @Getter
 @Setter
-public class FuncExpr extends BaseExpr {
+public class FuncExpr extends SectionExpr {
 
     public static final Set<String> funcSet = new HashSet<>();
-
-    private Map<String, Object> params;
 
     //是否稳幂等, 不随执行次数与上线文而改变
     public boolean idempotent = false;
@@ -29,14 +26,11 @@ public class FuncExpr extends BaseExpr {
     }
 
     public FuncExpr(String text, int startLine, int stopLine, int startCol, int stopCol) {
-        super(text);
-        this.startLine = startLine;
-        this.stopLine = stopLine;
-        this.startCol = startCol;
-        this.stopCol = stopCol;
+        super(text, startLine, stopLine, startCol, stopCol);
     }
 
-    public String getFuncText(){
+    @Override
+    public String getSectionText(){
         return text.substring(startCol, stopCol);
     }
 
@@ -44,7 +38,7 @@ public class FuncExpr extends BaseExpr {
         return funcSet.contains(funcName);
     }
 
-    public static void add(AbstractFunction func) {
-        funcSet.add(func.getName());
+    public static void add(ExprFunction func) {
+        funcSet.add(func.funcName());
     }
 }

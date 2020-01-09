@@ -3,6 +3,7 @@ package com.wjs.expr.eval;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.wjs.expr.ExprException;
+import com.wjs.expr.ExprFunction;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -32,5 +33,10 @@ public class QLExprEval implements ExprEval {
     @Override
     public Object call(String expr, Map<String, Object> params) {
         return null;
+    }
+
+    @Override
+    public void registerFunc(ExprFunction func) {
+
     }
 }

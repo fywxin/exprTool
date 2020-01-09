@@ -1,12 +1,10 @@
 package com.wjs.expr.func;
 
-import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
 import com.wjs.expr.ExprException;
-import com.wjs.expr.bean.BaseExpr;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -16,7 +14,7 @@ import java.util.Map;
  * @date 2020-01-06 17:02
  **/
 @Slf4j
-public class TestFunc extends AbstractFunction {
+public class TestFunc extends AbstractExprFunc {
 
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
@@ -34,7 +32,7 @@ public class TestFunc extends AbstractFunction {
     }
 
     @Override
-    public String getName() {
-        return BaseExpr.GRAMMAR + "test";
+    public String name() {
+        return "test";
     }
 }

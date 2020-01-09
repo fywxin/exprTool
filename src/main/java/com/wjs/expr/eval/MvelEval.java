@@ -1,5 +1,6 @@
 package com.wjs.expr.eval;
 
+import com.wjs.expr.ExprFunction;
 import org.mvel2.templates.TemplateRuntime;
 
 import java.util.Map;
@@ -22,5 +23,10 @@ public class MvelEval implements ExprEval {
     @Override
     public Object call(String expr, Map<String, Object> params) {
         return null;
+    }
+
+    @Override
+    public void registerFunc(ExprFunction func) {
+
     }
 }

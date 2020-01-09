@@ -13,7 +13,7 @@ import java.util.List;
  **/
 @Getter
 @Setter
-public class BaseExpr {
+public class BaseExpr implements Comparable<BaseExpr> {
     public static final Character GRAMMAR = '$';
 
     public static final String IF = "if";
@@ -65,5 +65,10 @@ public class BaseExpr {
     @Override
     public String toString() {
         return text.substring(startCol, stopCol);
+    }
+
+    @Override
+    public int compareTo(BaseExpr other) {
+        return this.startCol - other.startCol;
     }
 }

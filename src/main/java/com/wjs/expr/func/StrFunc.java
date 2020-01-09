@@ -1,10 +1,8 @@
 package com.wjs.expr.func;
 
-import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
-import com.wjs.expr.bean.BaseExpr;
 
 import java.util.Map;
 
@@ -12,7 +10,7 @@ import java.util.Map;
  * @author wjs
  * @date 2020-01-07 09:04
  **/
-public class StrFunc extends AbstractFunction {
+public class StrFunc extends AbstractExprFunc {
 
     @Override
     public AviatorObject call(Map<String, Object> env) {
@@ -41,7 +39,7 @@ public class StrFunc extends AbstractFunction {
     }
 
     @Override
-    public String getName() {
-        return BaseExpr.GRAMMAR + "str";
+    public String name() {
+        return "str";
     }
 }

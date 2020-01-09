@@ -1,9 +1,10 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.ExprExpr;
-import com.wjs.expr.bean.FuncExpr;
+import com.wjs.expr.bean.SectionExpr;
 import com.wjs.expr.eval.ExprEval;
 import com.wjs.expr.exprNative.ExprNativeService;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author wjs
  * @date 2020-01-02 10:22
  **/
+@Setter
 @Slf4j
 public class ExprEvalService {
 
@@ -25,9 +27,12 @@ public class ExprEvalService {
         return rs;
     }
 
-    public String eval(FuncExpr funcExpr){
-        String expr = funcExpr.getFuncText();
-        Object rs = exprEval.call(expr, funcExpr.getParams());
+    public String eval(SectionExpr sectionExpr){
+        String expr = sectionExpr.getSectionText();
+        if (expr == null || expr.trim().length() == 0){
+            return "";
+        }
+        Object rs = exprEval.call(expr, sectionExpr.getParams());
         if (rs == null){
             return "null";
         }

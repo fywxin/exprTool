@@ -1,12 +1,11 @@
 package com.wjs.expr.test;
 
-import com.wjs.expr.ExprEvalService;
 import com.wjs.expr.ExprGrammarService;
-import com.wjs.expr.ExprService;
-import com.wjs.expr.eval.AviatorEval;
-import com.wjs.expr.eval.ExprEval;
-import com.wjs.expr.exprNative.ExprNativeService;
-import com.wjs.expr.exprNative.SqlExprNativeService;
+import com.wjs.expr.ExprManager;
+import com.wjs.expr.func.ColValueFunc;
+import com.wjs.expr.func.IfNullFunc;
+import com.wjs.expr.func.StrFunc;
+import com.wjs.expr.func.TestFunc;
 import org.junit.Before;
 
 /**
@@ -15,18 +14,15 @@ import org.junit.Before;
  **/
 public class BaseTest {
 
-    public ExprGrammarService exprGrammarService = new ExprGrammarService();
-    public ExprService exprService = new ExprService();
-    public ExprEval exprEval = new AviatorEval();
-    public ExprNativeService exprNativeService = new SqlExprNativeService();
-    public ExprEvalService exprEvalService = new ExprEvalService();
+    public ExprManager exprService = ExprManager.ExprServiceHolder.getInstance();
+
+    ExprGrammarService exprGrammarService = exprService.exprGrammarService;
 
     @Before
     public void init(){
-        exprGrammarService.exprNativeService = exprNativeService;
-        exprService.exprGrammarService = exprGrammarService;
-        exprEvalService.exprEval = exprEval;
-        exprEvalService.exprNativeService = exprNativeService;
-        exprService.exprEvalService = exprEvalService;
+        exprService.registerFunc(new StrFunc());
+        exprService.registerFunc(new IfNullFunc());
+        exprService.registerFunc(new TestFunc());
+        exprService.registerFunc(new ColValueFunc());
     }
 }

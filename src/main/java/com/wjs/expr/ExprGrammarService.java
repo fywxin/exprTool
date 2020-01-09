@@ -1,7 +1,6 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
-import com.wjs.expr.common.Tuple2;
 import com.wjs.expr.exprNative.ExprNativeService;
 
 import java.util.ArrayList;
@@ -19,28 +18,21 @@ public class ExprGrammarService {
     public ExprNativeService exprNativeService;
 
     /**
-     * 顶层根表达式列表
-     * @param list
-     * @return
-     */
-    public List<Expr> root(List<Expr> list){
-        return list.stream().filter(x -> x.parent == null).collect(Collectors.toList());
-    }
-
-    /**
      * 语法解析提取
      * case when then else end 支持
      * @param text
      * @return
      */
-    public Tuple2<List<Expr>, List<FuncExpr>> parse(String text, boolean autoComplete) {
+    public Exprs parse(String text, boolean autoComplete) {
         Character c = null;
+        Character n = null;
         String frame = null;
         String cmd = null;
         int line = 0;
 
         List<Expr> list= new ArrayList<>();
         List<FuncExpr> funcExprList = new ArrayList<>();
+        List<SectionExpr> sectionExprList = new ArrayList<>();
 
         //待解析的表达式栈
         List<Expr> stack= new ArrayList<>();
@@ -48,10 +40,45 @@ public class ExprGrammarService {
 
         for (int i=0; i<text.length(); i++) {
             c = text.charAt(i);
+            //段落表达式解析 <$ 段落 $>
+            if (c == SectionExpr.SECTION_OPEN){
+                if (i < text.length()-1 && text.charAt(i+1) == BaseExpr.GRAMMAR){
+                    int startCol = i;
+                    int startLine = line;
+                    try {
+                        i = i + 2;
+                        c = text.charAt(i);
+                        n = text.charAt(i+1);
+                        if (c == '\n'){
+                            line++;
+                        }
+                        while (!(c == BaseExpr.GRAMMAR && n == SectionExpr.SECTION_CLOSE)){
+                            if (c == SectionExpr.SECTION_OPEN && n == BaseExpr.GRAMMAR){
+                                throw new ExprException("第["+(startLine+1)+" | "+(line+1)+"]行, 区间["+startCol+"-"+(i+2)+"] 片段表达式不支持循环嵌套:\n"+text.substring(startCol, i+2));
+                            }
+                            i++;
+                            c = text.charAt(i);
+                            n = text.charAt(i+1);
+                            if (c == '\n'){
+                                line++;
+                            }
+                        }
+                        i++;
+                        sectionExprList.add(new SectionExpr(text, startLine, line, startCol, i+1));
+                        continue;
+                    }catch (Exception e){
+                        if (e instanceof ExprException){
+                            throw e;
+                        }
+                        throw new ExprException("第["+(startLine+1)+" - "+(line+1)+"]行, 区间["+startCol+"-"+i+"] 片段表达式解析异常:\n"+text.substring(startCol, i-1), e);
+                    }
+                }
+            }
             if (c == '\n'){
                 line++;
                 continue;
             }
+
             if (c == BaseExpr.GRAMMAR){
                 i++;
                 frame = getWord(text, i);
@@ -182,7 +209,7 @@ public class ExprGrammarService {
             }
         }
         this.tree(list);
-        return new Tuple2<>(list, funcExprList);
+        return new Exprs(list, funcExprList, sectionExprList);
     }
 
     //TODO 性能优化，减去无必要的循环

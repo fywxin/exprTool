@@ -1,13 +1,9 @@
 package com.wjs.expr.test;
 
 import com.wjs.expr.ExprException;
-import com.wjs.expr.bean.Expr;
-import com.wjs.expr.bean.FuncExpr;
-import com.wjs.expr.common.Tuple2;
+import com.wjs.expr.bean.Exprs;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * @author wjs
@@ -34,8 +30,8 @@ public class GrammarTest extends BaseTest {
                 "group by ddate\n" +
                 "as e2;";
 
-        Tuple2<List<Expr>, List<FuncExpr>> tuple2 = exprGrammarService.parse(text, false);
-        Assert.assertTrue(tuple2.getFirst().size() == 2);
+        Exprs exprs = exprGrammarService.parse(text, false);
+        Assert.assertTrue(exprs.exprList.size() == 2);
     }
 
     @Test
@@ -49,8 +45,8 @@ public class GrammarTest extends BaseTest {
                 "$if ads=sdf $then\n" +
                 "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $end\n";
 
-        Tuple2<List<Expr>, List<FuncExpr>> tuple2 = exprGrammarService.parse(text, true);
-        Assert.assertTrue(tuple2.getFirst().size() == 2);
+        Exprs exprs = exprGrammarService.parse(text, true);
+        Assert.assertTrue(exprs.exprList.size() == 2);
     }
 
     @Test

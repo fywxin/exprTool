@@ -1,10 +1,10 @@
 package com.wjs.expr.test;
 
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.wjs.expr.ExprException;
-import com.wjs.expr.eval.AviatorEval;
 import com.wjs.expr.exprNative.SqlExprNativeService;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,22 +20,22 @@ import java.util.Map;
  * @author wjs
  * @date 2020-01-02 15:42
  **/
-public class AviatorTest {
+public class AviatorTest extends BaseTest {
 
-    AviatorEvaluatorInstance aviatorEvaluatorInstance = AviatorEval.aviatorEvaluatorInstance;
-    SqlExprNativeService sqlExprNativeService = new SqlExprNativeService();
+    AviatorEvaluatorInstance aviator = exprService.aviatorEval.getAviator();
+    SqlExprNativeService sqlExprNativeService = exprService.sqlExprNativeService;
 
 
     private void run(String... exprList){
         for (String expr : exprList){
-            Object rs = aviatorEvaluatorInstance.execute(sqlExprNativeService.exprNative(expr));
+            Object rs = aviator.execute(sqlExprNativeService.exprNative(expr));
             System.out.println(expr+" = "+rs);
         }
     }
 
     private void run(Map<String, Object> map, String... exprList){
         for (String expr : exprList){
-            Object rs = aviatorEvaluatorInstance.execute(sqlExprNativeService.exprNative(expr), map);
+            Object rs = aviator.execute(sqlExprNativeService.exprNative(expr), map);
             System.out.println(expr+" = "+rs);
         }
     }
@@ -118,9 +118,76 @@ public class AviatorTest {
         exprList.add("'and'=='and' and 1=1");
         exprList.add("'and'=='and' and 1=1 && 2==2");
         for (String expr : exprList){
-            Object rs = aviatorEvaluatorInstance.execute(expr);
+            Object rs = aviator.execute(expr);
             System.out.println(expr+" = "+rs);
         }
+    }
+
+    @Test
+    public void testAviatorExample(){
+
+        System.out.println(AviatorEvaluator.execute("a=1;a+1"));
+        Map<String, Object> env = new HashMap<String, Object>();
+        env.put("x", 1);
+        env.put("y", 2);
+        System.out.println(AviatorEvaluator.execute("y+1;x+1", env));
+
+        //AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
+        //字符串
+        System.out.println(AviatorEvaluator.execute(" 'a\"b' "));
+        System.out.println(AviatorEvaluator.execute(" \"a\'b\" "));
+        System.out.println(AviatorEvaluator.execute(" 'hello '+3 "));
+        System.out.println(AviatorEvaluator.execute(" 'hello '+ unkno2w "));
+
+        //三元计算表达式
+        env = new HashMap<String, Object>();
+        env.put("a", 1);
+        String result = (String) AviatorEvaluator.execute("a>0? 'yes':'no'", env);
+        System.out.println(result);
+
+
+        //数组访问
+        int[] a = new int[10];
+        for (int i = 0; i < 10; i++) {
+            a[i] = i;
+        }
+        env = new HashMap<String, Object>();
+        env.put("a", a);
+
+        System.out.println(AviatorEvaluator.execute("a[1] + 100", env));
+        System.out.println(AviatorEvaluator.execute("'a[1]=' + a[1]", env));
+        System.out.println(AviatorEvaluator.execute("count(a)", env));
+        System.out.println(AviatorEvaluator.execute("reduce(a,+,0)", env));
+        System.out.println(AviatorEvaluator.execute("seq.every(a,seq.gt(0))", env));
+        System.out.println(AviatorEvaluator.execute("seq.every(a,seq.and(seq.ge(0), seq.lt(10)))", env));
+        System.out.println(AviatorEvaluator.execute("seq.not_any(a,seq.and(seq.ge(0), seq.lt(10)))", env));
+        System.out.println(AviatorEvaluator.execute("seq.not_any(a,seq.and(seq.lt(0), seq.ge(10)))", env));
+        System.out.println(AviatorEvaluator.execute("seq.some(a,seq.eq(3))", env));
+
+        //Nil
+        System.out.println(AviatorEvaluator.execute("nil == nil"));
+        System.out.println(AviatorEvaluator.execute(" 3> nil"));
+        System.out.println(AviatorEvaluator.execute(" ' '>nil "));
+        System.out.println(AviatorEvaluator.execute(" a==nil "));
+        System.out.println(AviatorEvaluator.execute(" 1!=nil "));
+        System.out.println(AviatorEvaluator.execute(" nil<='hello' "));
+
+        //lambda
+        String exp = "a=1; b = lambda(x) -> a+ x end ; a=4 ; b(5)";
+        System.out.println(AviatorEvaluator.execute(exp)); // output 6
+
+        env = new HashMap<String, Object>();
+        env.put("x", 1);
+        env.put("y", 2);
+        env.put("z", 3);
+
+        AviatorEvaluator.defineFunction("test","lambda(x) -> lambda(y) -> lambda(z) -> x + y + z end end end");
+        System.out.println(AviatorEvaluator.execute("test(4)(5)(6)", env)); // output 15
+
+        env.put("a", 4);
+        System.out.println(AviatorEvaluator.execute("test(4)(5)(6) + a", env)); // output 19
+
+        System.out.println();
     }
 
     @Getter
