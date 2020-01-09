@@ -27,7 +27,11 @@ public class GrammarTest extends BaseTest {
                 "   where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                 "   and activityid=30015\n" +
                 "$end\n" +
+                "$for (i=0; i<100;i++)\n" +
+                "$for (i=0; i<100;i++)\n" +
                 "group by ddate\n" +
+                "$endfor\n" +
+                "$endfor\n" +
                 "as e2;";
 
         Exprs exprs = exprGrammarService.parse(text, false);

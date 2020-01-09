@@ -20,13 +20,19 @@ public class BaseExpr implements Comparable<BaseExpr> {
     public static final String THEN = "then";
     public static final String ELSE = "else";
     public static final String ELIF = "elif";
-    public static final String END = "end";
+    public static final String ENDIF = "end";
+
+    public static final String FOR = "for";
+    public static final String ENDFOR = "endfor";
 
     public static final String _IF = GRAMMAR + IF;
     public static final String _THEN = GRAMMAR + THEN;
     public static final String _ELSE = GRAMMAR + ELSE;
     public static final String _ELIF = GRAMMAR + ELIF;
-    public static final String _END = GRAMMAR + END;
+    public static final String _ENDIF = GRAMMAR + ENDIF;
+
+    public static final String _FOR = GRAMMAR + FOR;
+    public static final String _ENDFOR  = GRAMMAR + ENDFOR;
 
     //原始表达式语句
     public String text;
