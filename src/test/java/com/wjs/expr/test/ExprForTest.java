@@ -277,4 +277,62 @@ public class ExprForTest extends BaseTest {
                 "\n" +
                 "ee").equals(rs));
     }
+
+    @Test
+    public void test9(){
+        Map<String, Object> params = new HashMap<>();
+        params.put("woe", true);
+
+        String sql = "dd\n" +
+                "$for(i=0;i<2;i++)\n" +
+                "   1" +
+                "   $if(i==0) $then\n" +
+                "       $for(j=0;j<3;j++)\n" +
+                "           x<$i$>_<$j$>\n" +
+                "       $endfor\n" +
+                "   $end\n" +
+                "   2\n" +
+                "$endfor\n" +
+                "ee";
+        String rs = exprService.eval(sql, params);
+        System.out.println(rs);
+        Assert.assertTrue(("dd\n" +
+                "   1   \n" +
+                "                  x0_0\n" +
+                "                  x0_1\n" +
+                "                  x0_2\n" +
+                "       \n" +
+                "   \n" +
+                "   2\n" +
+                "   1   \n" +
+                "   2\n" +
+                "\n" +
+                "ee").equals(rs));
+    }
+
+    @Test
+    public void test10(){
+        Map<String, Object> params = new HashMap<>();
+        params.put("woe", true);
+
+        String sql = "dd\n" +
+                "$for(i=0;i<2;i++)\n" +
+                "   $for(j=i;j<3;j++)\n" +
+                "       x<$i$>_<$j$>\n" +
+                "   $endfor\n" +
+                "$endfor\n" +
+                "ee";
+        String rs = exprService.eval(sql, params);
+        System.out.println(rs);
+        Assert.assertTrue(("dd\n" +
+                "          x0_0\n" +
+                "          x0_1\n" +
+                "          x0_2\n" +
+                "   \n" +
+                "          x1_1\n" +
+                "          x1_2\n" +
+                "   \n" +
+                "\n" +
+                "ee").equals(rs));
+    }
 }

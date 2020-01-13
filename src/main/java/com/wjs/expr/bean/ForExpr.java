@@ -2,6 +2,7 @@ package com.wjs.expr.bean;
 
 import com.wjs.expr.ExprException;
 import com.wjs.expr.commons.Tuple2;
+import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +25,7 @@ public class ForExpr extends BodyExpr {
 
     private ForEnum forEnum;
 
-    private Tuple2<String, Integer> ternaryVar;
+    private Tuple3<String, Integer, String> ternaryVar;
 
     private String ternaryPredicate;
 
@@ -58,7 +59,11 @@ public class ForExpr extends BodyExpr {
                 this.ternaryPredicate = arr[1].trim();
                 this.ternaryOpt = arr[2].trim().replaceAll("\\+\\+", "+1").replaceAll("--", "-1");
                 arr = arr[0].split("=");
-                this.ternaryVar = new Tuple2<>(arr[0].trim(), Integer.parseInt(arr[1].trim()));
+                try {
+                    this.ternaryVar = new Tuple3<>(arr[0].trim(), Integer.parseInt(arr[1].trim()), null);
+                }catch (Exception e){
+                    this.ternaryVar = new Tuple3<>(arr[0].trim(), null, arr[1].trim());
+                }
             }
         }catch (Exception e) {
             throw new ExprException("第["+startLine+"]行, 区间["+startCol+" - "+bodyStartCol+"] 的"+_FOR+" 表达式["+this.forText+"]格式错误", e);

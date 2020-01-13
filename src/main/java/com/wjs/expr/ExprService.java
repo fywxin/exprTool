@@ -110,7 +110,11 @@ public class ExprService {
             Object oldVal = params.get(key);
             try {
                 int loop = 0;
-                params.put(key, forExpr.getTernaryVar().getSecond());
+                if (forExpr.getTernaryVar().getSecond() == null){
+                    params.put(key, params.get(forExpr.getTernaryVar().getThird()));
+                }else{
+                    params.put(key, forExpr.getTernaryVar().getSecond());
+                }
                 while (exprEval.eval(forExpr.getTernaryPredicate(), params)) {
                     sb.append(eval(text, subExprTree, forExpr.bodyStartCol, forExpr.bodyStopCol));
                     params.put(key, exprEval.call(forExpr.getTernaryOpt(), params));

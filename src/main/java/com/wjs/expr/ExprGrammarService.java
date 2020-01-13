@@ -200,9 +200,6 @@ public class ExprGrammarService {
                             throw new ExprException("第["+(line+1)+"]行 "+BaseExpr._ENDFOR+" 找不到匹配的 "+BaseExpr._FOR);
                         }
                         ForExpr forExpr = forStack.remove(forStack.size()-1).finish(line, i+BaseExpr.ENDFOR.length(), i-1);
-                        if (!forStack.isEmpty()){
-                            throw new ExprException("第["+(forStack.remove(forStack.size()-1).getStartLine()+1)+"]行 "+BaseExpr._FOR+" 不支持循环嵌套");
-                        }
                         //for 是IF的子节点
                         if (!ifStack.isEmpty()){
                             forExpr.setParent(ifStack.get(ifStack.size()-1));
