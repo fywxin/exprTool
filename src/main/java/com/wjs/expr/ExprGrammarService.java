@@ -6,7 +6,6 @@ import com.wjs.expr.exprNative.ExprNativeService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 表达式语法解析器
@@ -23,22 +22,22 @@ public class ExprGrammarService {
      * @param text
      * @return
      */
-    public Exprs parse(String text, boolean autoComplete) {
+    public ExprTree parse(String text, boolean autoComplete) {
         Character c = null;
         Character n = null;
         String frame = null;
         String cmd = null;
         int line = 0;
 
-        List<Expr> list= new ArrayList<>();
+        List<BinaryExpr> list= new ArrayList<>();
         List<FuncExpr> funcExprList = new ArrayList<>();
         List<SectionExpr> sectionExprList = new ArrayList<>();
         List<ForExpr> forExprList = new ArrayList<>();
 
         //待解析的表达式栈
-        List<Expr> ifStack= new ArrayList<>();
+        List<BinaryExpr> ifStack= new ArrayList<>();
         List<ForExpr> forStack= new ArrayList<>();
-        Expr expr = null;
+        BinaryExpr binaryExpr = null;
 
         for (int i=0; i<text.length(); i++) {
             c = text.charAt(i);
@@ -76,6 +75,7 @@ public class ExprGrammarService {
                     }
                 }
             }
+
             if (c == '\n'){
                 line++;
                 continue;
@@ -87,22 +87,22 @@ public class ExprGrammarService {
                 cmd = frame.toLowerCase();
                 switch (cmd){
                     case BaseExpr.IF:
-                        expr = new Expr(new IfExpr(text, line, i - 1, i + BaseExpr.IF.length()));
+                        binaryExpr = new BinaryExpr(new IfExpr(text, line, i - 1, i + BaseExpr.IF.length()));
                         //父表达式 -> 栈上最近一个未完成的表达式
                         for (int j=ifStack.size()-1; j>=0; j--){
                             if (!ifStack.get(j).isOk()){
-                                expr.parent = ifStack.get(j);
+                                binaryExpr.parentBinary = ifStack.get(j);
                                 break;
                             }
                         }
-                        ifStack.add(expr);
+                        ifStack.add(binaryExpr);
                         break;
                     case BaseExpr.THEN:
                         this.checkIf(ifStack, line);
-                        expr = ifStack.get(ifStack.size()-1);
+                        binaryExpr = ifStack.get(ifStack.size()-1);
                         //if
-                        if (expr.elifExprList.isEmpty()){
-                            IfExpr ifExpr = expr.ifExpr;
+                        if (binaryExpr.elifExprList.isEmpty()){
+                            IfExpr ifExpr = binaryExpr.ifExpr;
                             if (ifExpr.getExprStopCol() == null){
                                 ifExpr.setExprStopCol(i-1);
                                 ifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
@@ -111,7 +111,7 @@ public class ExprGrammarService {
                             }
                         //elif
                         } else {
-                            ElifExpr elifExpr = expr.lastElifExpr();
+                            ElifExpr elifExpr = binaryExpr.lastElifExpr();
                             if (elifExpr.getExprStopCol() == null){
                                 elifExpr.setExprStopCol(i-1);
                                 elifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
@@ -122,37 +122,42 @@ public class ExprGrammarService {
                         break;
                     case BaseExpr.ELIF:
                         this.checkIf(ifStack, line);
-                        expr = ifStack.get(ifStack.size()-1);
-                        if (expr.elifExprList.isEmpty()){
-                            endIfExpr(expr, line, i);
+                        binaryExpr = ifStack.get(ifStack.size()-1);
+                        if (binaryExpr.elifExprList.isEmpty()){
+                            endIfExpr(binaryExpr, line, i);
                         } else {
-                            endElIfExpr(expr, line, i);
+                            endElIfExpr(binaryExpr, line, i);
                         }
-                        expr.addElifExpr(new ElifExpr(text, line, i-1, i+BaseExpr.ELIF.length()));
+                        binaryExpr.addElifExpr(new ElifExpr(text, line, i-1, i+BaseExpr.ELIF.length()));
                         break;
                     case BaseExpr.ELSE:
                         this.checkIf(ifStack, line);
-                        expr = ifStack.get(ifStack.size()-1);
-                        if (expr.elifExprList.isEmpty()){
-                            endIfExpr(expr, line, i);
+                        binaryExpr = ifStack.get(ifStack.size()-1);
+                        if (binaryExpr.elifExprList.isEmpty()){
+                            endIfExpr(binaryExpr, line, i);
                         } else {
-                            endElIfExpr(expr, line, i);
+                            endElIfExpr(binaryExpr, line, i);
                         }
 
-                        expr.setElseExpr(Optional.of(new ElseExpr(text, line, i-1)));
+                        binaryExpr.setElseExpr(Optional.of(new ElseExpr(text, line, i-1)));
                         break;
                     case BaseExpr.ENDIF:
                         this.checkIf(ifStack, line);
                         //表达式解析完成，出栈
-                        expr = ifStack.remove(ifStack.size()-1).finish(line, i+BaseExpr.ENDIF.length());
-                        if(expr.elseExpr.isPresent()){
-                            endElse(expr, line, i);
-                        }else if (expr.elifExprList.isEmpty()){
-                            endIfExpr(expr, line, i);
+                        binaryExpr = ifStack.remove(ifStack.size()-1).finish(line, i+BaseExpr.ENDIF.length());
+                        if(binaryExpr.elseExpr.isPresent()){
+                            endElse(binaryExpr, line, i);
+                        }else if (binaryExpr.elifExprList.isEmpty()){
+                            endIfExpr(binaryExpr, line, i);
                         } else{
-                            endElIfExpr(expr, line, i);
+                            endElIfExpr(binaryExpr, line, i);
                         }
-                        list.add(expr);
+                        //for未完成
+                        if (!forStack.isEmpty()){
+                            binaryExpr.setParentFor(forStack.get(forStack.size()-1));
+                        }
+
+                        list.add(binaryExpr);
                         break;
                     case BaseExpr.FOR:
                         int start = i-1;
@@ -194,9 +199,13 @@ public class ExprGrammarService {
                         if (forStack.isEmpty()){
                             throw new ExprException("第["+(line+1)+"]行 "+BaseExpr._ENDFOR+" 找不到匹配的 "+BaseExpr._FOR);
                         }
-                        ForExpr forExpr = forStack.remove(forStack.size()-1).finish(line, i+BaseExpr.ENDFOR.length());
+                        ForExpr forExpr = forStack.remove(forStack.size()-1).finish(line, i+BaseExpr.ENDFOR.length(), i-1);
                         if (!forStack.isEmpty()){
                             throw new ExprException("第["+(forStack.remove(forStack.size()-1).getStartLine()+1)+"]行 "+BaseExpr._FOR+" 不支持循环嵌套");
+                        }
+                        //for 是IF的子节点
+                        if (!ifStack.isEmpty()){
+                            forExpr.setParent(ifStack.get(ifStack.size()-1));
                         }
                         forExprList.add(forExpr);
                         break;
@@ -239,55 +248,38 @@ public class ExprGrammarService {
         if (autoComplete){
             while (!ifStack.isEmpty()){
                 int i = text.length();
-                expr = ifStack.remove(ifStack.size()-1).finish(line, i);
-                if(expr.elseExpr.isPresent()){
-                    endElse(expr, line, i+1);
-                    ElseExpr elseExpr = expr.elseExpr.get();
+                binaryExpr = ifStack.remove(ifStack.size()-1).finish(line, i);
+                if(binaryExpr.elseExpr.isPresent()){
+                    endElse(binaryExpr, line, i+1);
+                    ElseExpr elseExpr = binaryExpr.elseExpr.get();
                     elseExpr.setStopCol(i);
                     elseExpr.autoComplete = true;
-                }else if (expr.elifExprList.isEmpty()){
-                    endIfExpr(expr, line, i+1);
-                    expr.ifExpr.autoComplete = true;
+                }else if (binaryExpr.elifExprList.isEmpty()){
+                    endIfExpr(binaryExpr, line, i+1);
+                    binaryExpr.ifExpr.autoComplete = true;
                 } else{
-                    endElIfExpr(expr, line, i+1);
-                    expr.lastElifExpr().autoComplete = true;
+                    endElIfExpr(binaryExpr, line, i+1);
+                    binaryExpr.lastElifExpr().autoComplete = true;
                 }
-                expr.autoComplete = true;
-                list.add(expr);
+                binaryExpr.autoComplete = true;
+                list.add(binaryExpr);
             }
         }else {
             if (!ifStack.isEmpty()) {
                 throw new ExprException("缺失第[" + (ifStack.get(0).getStartLine() + 1) + "]行 "+BaseExpr._IF+" 对应的 "+BaseExpr._ENDIF+", 未闭合错误");
             }
         }
-        this.tree(list);
-        return new Exprs(list, funcExprList, sectionExprList, forExprList);
+        return new ExprTree(list, funcExprList, sectionExprList, forExprList, 0, text.length(), null);
     }
 
-    //TODO 性能优化，减去无必要的循环
-    private void tree(List<Expr> list){
-        for (Expr expr : list){
-            List<Expr> child = list.stream().filter(x -> x.parent == expr).collect(Collectors.toList());
-            if (!child.isEmpty()){
-                expr.ifExpr.setChildExprList(child.stream().filter(x -> expr.ifExpr.contain(x)).collect(Collectors.toList()));
-                for (ElifExpr elifExpr : expr.elifExprList) {
-                    elifExpr.setChildExprList(child.stream().filter(x -> child.contains(x)).collect(Collectors.toList()));
-                }
-                if (expr.elseExpr.isPresent()){
-                    expr.elseExpr.get().setChildExprList(child.stream().filter(x -> expr.elseExpr.get().contain(x)).collect(Collectors.toList()));
-                }
-            }
-        }
-    }
-
-    private void checkIf(List<Expr> ifStack, int line){
+    private void checkIf(List<BinaryExpr> ifStack, int line){
         if (ifStack.isEmpty() || ifStack.get(ifStack.size()-1).ifExpr == null) {
             throw new ExprException("第["+line+"]行之上, 缺少 "+BaseExpr._IF+" 关键字");
         }
     }
 
-    private void endIfExpr(Expr expr, Integer line, int i) {
-        IfExpr ifExpr = expr.ifExpr;
+    private void endIfExpr(BinaryExpr binaryExpr, Integer line, int i) {
+        IfExpr ifExpr = binaryExpr.ifExpr;
         if (ifExpr.getBodyStartCol() == null){
             throw new ExprException("第["+(ifExpr.getStartLine()+1)+"]行 "+BaseExpr._IF+" 缺少 "+BaseExpr._THEN+" 关键字");
         }
@@ -296,8 +288,8 @@ public class ExprGrammarService {
         ifExpr.setStopCol(i-1);
     }
 
-    private void endElIfExpr(Expr expr, Integer line, int i){
-        ElifExpr elifExpr = expr.lastElifExpr();
+    private void endElIfExpr(BinaryExpr binaryExpr, Integer line, int i){
+        ElifExpr elifExpr = binaryExpr.lastElifExpr();
         if (elifExpr.getBodyStartCol() == null){
             throw new ExprException("第["+(elifExpr.getStartLine()+1)+"]行 "+BaseExpr._ELIF+" 缺少 "+BaseExpr._THEN+" 关键字");
         }
@@ -306,8 +298,8 @@ public class ExprGrammarService {
         elifExpr.setStopCol(i-1);
     }
 
-    private void endElse(Expr expr, Integer line, int i) {
-        ElseExpr elseExpr = expr.elseExpr.get();
+    private void endElse(BinaryExpr binaryExpr, Integer line, int i) {
+        ElseExpr elseExpr = binaryExpr.elseExpr.get();
         elseExpr.setStopLine(line);
         elseExpr.setBodyStopCol(i-1);
         elseExpr.setStopCol(i+BaseExpr.ENDIF.length());

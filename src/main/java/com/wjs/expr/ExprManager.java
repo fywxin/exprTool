@@ -2,6 +2,7 @@ package com.wjs.expr;
 
 import com.wjs.expr.eval.AviatorEval;
 import com.wjs.expr.exprNative.SqlExprNativeService;
+import com.wjs.expr.listener.IForInListener;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +32,10 @@ public class ExprManager extends ExprService {
 
     public void registerFunc(ExprFunction func){
         aviatorEval.registerFunc(func);
+    }
+
+    public void addForInListener(IForInListener listener){
+        forInListenerList.add(listener);
     }
 
     public static class ExprServiceHolder{

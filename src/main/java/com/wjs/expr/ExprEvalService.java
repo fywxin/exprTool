@@ -7,6 +7,8 @@ import com.wjs.expr.exprNative.ExprNativeService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+
 /**
  * 表达式断言求知执行器
  * @author wjs
@@ -20,19 +22,19 @@ public class ExprEvalService {
 
     public ExprEval exprEval;
 
-    public boolean eval(ExprExpr exprExpr){
+    public boolean eval(ExprExpr exprExpr, Map<String, Object> params){
         String expr = exprNativeService.exprNative(exprExpr.getExprText());
-        Boolean rs = exprEval.eval(expr, exprExpr.getParams());
-        log.info("{}({}) = {}", expr, exprExpr.getParams(), rs);
+        Boolean rs = exprEval.eval(expr, params);
+        log.info("{}({}) = {}", expr, params, rs);
         return rs;
     }
 
-    public String eval(SectionExpr sectionExpr){
+    public String eval(SectionExpr sectionExpr, Map<String, Object> params){
         String expr = sectionExpr.getSectionText();
         if (expr == null || expr.trim().length() == 0){
             return "";
         }
-        Object rs = exprEval.call(expr, sectionExpr.getParams());
+        Object rs = exprEval.call(expr, params);
         if (rs == null){
             return "null";
         }

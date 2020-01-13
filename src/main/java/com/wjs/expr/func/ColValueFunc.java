@@ -23,7 +23,7 @@ public class ColValueFunc extends AbstractExprFunc {
         AviatorLong line = (AviatorLong)arg3;
         long num = line.longValue();
 
-        String val = getName()+"("+stepId+", '"+col+"', "+num+")";
+        String val = getName()+"["+stepId+"_"+col+"_"+num+"]";
         System.out.println(val);
         return new AviatorString(val);
     }

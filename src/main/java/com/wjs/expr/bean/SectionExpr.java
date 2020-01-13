@@ -3,8 +3,6 @@ package com.wjs.expr.bean;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-
 /**
  * 段落表达式，跨行则用封号分割 <$ 表达式 $>
  * @author wjs
@@ -17,8 +15,6 @@ public class SectionExpr extends BaseExpr {
     public static final Character SECTION_OPEN = '<';
 
     public static final Character SECTION_CLOSE = '>';
-
-    public Map<String, Object> params;
 
     public SectionExpr(String text) {
         super(text);

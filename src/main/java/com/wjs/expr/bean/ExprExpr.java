@@ -3,8 +3,6 @@ package com.wjs.expr.bean;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-
 /**
  * 包含断言条件的表达式
  * if - elif
@@ -19,8 +17,6 @@ public class ExprExpr extends BodyExpr {
     public Integer exprStartCol;
 
     public Integer exprStopCol;
-
-    private Map<String, Object> params;
 
     public ExprExpr(String text, Integer startLine, Integer startCol, Integer exprStartCol) {
         super(text, startLine, startCol);

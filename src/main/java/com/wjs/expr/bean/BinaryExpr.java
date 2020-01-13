@@ -15,7 +15,7 @@ import java.util.Optional;
  **/
 @Getter
 @Setter
-public class Expr extends BaseExpr {
+public class BinaryExpr extends BaseExpr {
 
     public IfExpr ifExpr;
 
@@ -23,18 +23,22 @@ public class Expr extends BaseExpr {
 
     public Optional<ElseExpr> elseExpr = Optional.empty();
 
-    public Expr parent;
+    public BinaryExpr parentBinary;
+
+    public ForExpr parentFor;
 
     public boolean ok = false;
 
-    public Expr(IfExpr ifExpr) {
+
+
+    public BinaryExpr(IfExpr ifExpr) {
         super(ifExpr.getText());
         this.ifExpr = ifExpr;
         this.setStartLine(ifExpr.startLine);
         this.setStartCol(ifExpr.startCol);
     }
 
-    public Expr finish(Integer stopLine, Integer stopCol) {
+    public BinaryExpr finish(Integer stopLine, Integer stopCol) {
         this.setStopLine(stopLine);
         this.setStopCol(stopCol);
         this.ok = true;
@@ -72,7 +76,7 @@ public class Expr extends BaseExpr {
                 "ifExpr=" + ifExpr +
                 ", elifExprList=" + elifExprList +
                 ", elseExpr=" + elseExpr +
-                ", parent=" + parent +
+                ", parent=" + parentBinary +
                 ", ok=" + ok +
                 '}';
     }

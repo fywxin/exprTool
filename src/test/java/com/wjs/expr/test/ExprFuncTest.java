@@ -35,7 +35,7 @@ public class ExprFuncTest extends BaseTest {
         Assert.assertTrue(("select 1 from \n" +
                 "\n" +
                 "1.1 Null, Arg_val\n" +
-                "   1.1.0  1.1.1$colValue(cc, 'Arg_a', 1)Arg_b_c1.1.2  1.1.3\n" +
+                "   1.1.0  1.1.1$colValue[cc_Arg_a_1]Arg_b_c1.1.2  1.1.3\n" +
                 "\n" +
                 "test").equals(rs));
     }

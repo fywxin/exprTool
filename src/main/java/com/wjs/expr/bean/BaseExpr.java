@@ -3,9 +3,6 @@ package com.wjs.expr.bean;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 表达式模型基类
  * @author wjs
@@ -48,9 +45,6 @@ public class BaseExpr implements Comparable<BaseExpr> {
     //是否自动适配补充完成的
     public boolean autoComplete = false;
 
-    //嵌套子表达式
-    private List<Expr> childExprList = new ArrayList<>();
-
     public BaseExpr(String text) {
         this.text = text;
     }
@@ -66,6 +60,14 @@ public class BaseExpr implements Comparable<BaseExpr> {
      */
     public boolean contain(BaseExpr other){
         return this.startCol <= other.startCol && this.stopCol >= other.stopCol;
+    }
+
+    public boolean in(int startCol, int stopCol){
+        return this.startCol >= startCol && this.stopCol <= stopCol;
+    }
+
+    public boolean in(BaseExpr other){
+        return this.startCol >= other.startCol && this.stopCol <= other.stopCol;
     }
 
     @Override

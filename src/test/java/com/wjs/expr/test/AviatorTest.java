@@ -187,7 +187,7 @@ public class AviatorTest extends BaseTest {
         env.put("a", 4);
         System.out.println(AviatorEvaluator.execute("test(4)(5)(6) + a", env)); // output 19
 
-        System.out.println();
+        System.out.println(AviatorEvaluator.execute("a++", env));
     }
 
     @Getter

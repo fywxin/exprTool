@@ -4,11 +4,14 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.wjs.expr.ExprException;
 import com.wjs.expr.ExprFunction;
 import com.wjs.expr.bean.FuncExpr;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 基于 Aviator 的表达式执行器
@@ -23,6 +26,14 @@ public class AviatorEval implements ExprEval {
     static {
         aviator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
         aviator.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, false);
+        try {
+            aviator.addInstanceFunctions("LIST", List.class);
+            aviator.addInstanceFunctions("SET", Set.class);
+            aviator.addInstanceFunctions("STRING", String.class);
+            aviator.addInstanceFunctions("MAP", Map.class);
+        } catch (Exception e) {
+            throw new ExprException("对象方法注册异常", e);
+        }
     }
 
     @Override

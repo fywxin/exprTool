@@ -1,7 +1,7 @@
 package com.wjs.expr.test;
 
 import com.wjs.expr.ExprException;
-import com.wjs.expr.bean.Exprs;
+import com.wjs.expr.bean.ExprTree;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,8 +34,8 @@ public class GrammarTest extends BaseTest {
                 "$endfor\n" +
                 "as e2;";
 
-        Exprs exprs = exprGrammarService.parse(text, false);
-        Assert.assertTrue(exprs.exprList.size() == 2);
+        ExprTree exprTree = exprGrammarService.parse(text, false);
+        Assert.assertTrue(exprTree.binaryExprList.size() == 2);
     }
 
     @Test
@@ -49,8 +49,8 @@ public class GrammarTest extends BaseTest {
                 "$if ads=sdf $then\n" +
                 "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $end\n";
 
-        Exprs exprs = exprGrammarService.parse(text, true);
-        Assert.assertTrue(exprs.exprList.size() == 2);
+        ExprTree exprTree = exprGrammarService.parse(text, true);
+        Assert.assertTrue(exprTree.binaryExprList.size() == 2);
     }
 
     @Test
