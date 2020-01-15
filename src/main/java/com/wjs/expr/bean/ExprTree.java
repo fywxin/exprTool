@@ -42,6 +42,8 @@ public class ExprTree {
 
     public Map<String, Object> params;
 
+
+
     public ExprTree(List<BinaryExpr> binaryExprList, List<FuncExpr> funcExprList, List<SectionExpr> sectionExprList, List<ForExpr> forExprList, Integer startCol, Integer stopCol, BaseExpr parent) {
         this.binaryExprList = binaryExprList;
         this.funcExprList = funcExprList;
@@ -148,5 +150,14 @@ public class ExprTree {
 
     private List<SectionExpr> innerSection(List<? extends SectionExpr> list, int startCol, int stopCol){
         return list.stream().filter(x -> x.startCol >= startCol && x.stopCol <= stopCol).collect(Collectors.toList());
+    }
+
+    /**
+     * 重置缓存对象
+     */
+    public void reset(){
+        topExprList = null;
+        walkIndex = 0;
+        params = null;
     }
 }

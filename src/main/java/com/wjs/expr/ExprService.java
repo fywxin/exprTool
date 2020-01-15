@@ -21,7 +21,7 @@ public class ExprService {
 
     public List<IForInListener> forInListenerList = new ArrayList<>();
 
-    public static final Integer MAX_LOOP = 10000;
+    public static final Integer MAX_LOOP = 1000;
 
     /**
      * 入口函数，表达式解析执行
@@ -136,26 +136,18 @@ public class ExprService {
             int i = 0;
             try {
                 IForInListener.callBefore(forInListenerList, subExprTree, forExpr);
-                if (target instanceof List) {
-                    List list = (List) target;
-                    for (Object obj : list) {
-                        params.put(key, obj);
-                        params.put(key_index, i);
-                        params.put(key_FIRST, i == 0);
-                        params.put(key_LAST, i == list.size()-1);
-                        sb.append(eval(text, subExprTree, forExpr.bodyStartCol, forExpr.bodyStopCol));
-                        IForInListener.callIn(forInListenerList, subExprTree, forExpr, key, obj, i);
-                        i++;
+                if (target instanceof Collection) {
+                    Collection cc = (Collection) target;
+                    if (cc.size() > MAX_LOOP){
+                        throw new ExprException("第["+forExpr.getStartLine()+"]行"+BaseExpr._FOR + "表达式["+forExpr.getForText()+"]数据源["+forExpr.getInState().getSecond()+"]记录数超过["+MAX_LOOP+"]");
                     }
-                }else if (target instanceof Set){
-                    Set set = (Set) target;
-                    Iterator iterator = set.iterator();
+                    Iterator iterator = cc.iterator();
                     while (iterator.hasNext()){
                         Object obj = iterator.next();
                         params.put(key, obj);
                         params.put(key_index, i);
                         params.put(key_FIRST, i == 0);
-                        params.put(key_LAST, i == set.size()-1);
+                        params.put(key_LAST, i == cc.size()-1);
                         sb.append(eval(text, subExprTree, forExpr.bodyStartCol, forExpr.bodyStopCol));
                         IForInListener.callIn(forInListenerList, subExprTree, forExpr, key, obj, i);
                         i++;
