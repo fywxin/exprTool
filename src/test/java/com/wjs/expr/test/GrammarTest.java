@@ -20,13 +20,13 @@ public class GrammarTest extends BaseTest {
                 "group by ddate\n" +
                 "as e1;\n" +
                 "$if ads=sdf $then\n" +
-                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $end\n" +
+                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $endif\n" +
                 "$elif ds=dffff adn $then;\n" +
                 "   from hive.woe.l_activity_taskcomplete_log\n" +
                 "$else\n" +
                 "   where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                 "   and activityid=30015\n" +
-                "$end\n" +
+                "$endif\n" +
                 "$for (i=0; i<100;i++)\n" +
                 "$for (i=0; i<100;i++)\n" +
                 "group by ddate\n" +
@@ -47,7 +47,7 @@ public class GrammarTest extends BaseTest {
                 "group by ddate\n" +
                 "as e1;\n" +
                 "$if ads=sdf $then\n" +
-                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $end\n";
+                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $endif\n";
 
         ExprTree exprTree = exprGrammarService.parse(text, true);
         Assert.assertTrue(exprTree.binaryExprList.size() == 2);
@@ -62,7 +62,7 @@ public class GrammarTest extends BaseTest {
                 "group by ddate\n" +
                 "as e1;\n" +
                 "$if ads=sdf $then\n" +
-                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  1=1 $then dsdds $else sayhello $end\n";
+                "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  1=1 $then dsdds $else sayhello $endif\n";
 
         Assert.assertThrows(ExprException.class, () -> exprGrammarService.parse(text, true));
     }

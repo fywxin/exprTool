@@ -18,14 +18,14 @@ public class ExprFuncTest extends BaseTest {
         String sql="select 1 from \n" +
                 "$if a=1 $then\n" +
                 "1.1 $ifnull($str(),'Null'), $ifnull($str('val'),'Null')\n" +
-                "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $end 1.1.3\n" +
+                "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $endif 1.1.3\n" +
                 "$elif a=2 $then\n" +
                 "1.2\n" +
                 "$elif a=3 $then\n" +
                 "1.3\n" +
                 "$else\n" +
                 "1.4\n" +
-                "$end\n" +
+                "$endif\n" +
                 "test";
         Map<String, Object> map = new HashMap<>();
         map.put("a", 1);

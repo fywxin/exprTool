@@ -27,15 +27,15 @@ public class ExprTest extends BaseTest {
                 "\t\t\t2.1.2\n" +
                 "\t\t$else\n" +
                 "\t\t\t2.1.3\n" +
-                "\t\t$end\n" +
+                "\t\t$endif\n" +
                 "\t\t2.2\n" +
                 "\t$else\n" +
                 "\t\t333\n" +
-                "\t$end\n" +
+                "\t$endif\n" +
                 "  where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                 "$else\n" +
                 "   and activityid=30015\n" +
-                "$end\n" +
+                "$endif\n" +
                 "NNNNNN\n" +
                 "$if 1==1 $then\n" +
                 "  select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
@@ -48,15 +48,15 @@ public class ExprTest extends BaseTest {
                 "\t\t\t2.1.2\n" +
                 "\t\t$else\n" +
                 "\t\t\t2.1.3\n" +
-                "\t\t$end\n" +
+                "\t\t$endif\n" +
                 "\t\t2.2\n" +
                 "\t$else\n" +
                 "\t\t333\n" +
-                "\t$end\n" +
+                "\t$endif\n" +
                 "  where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                 "$else\n" +
                 "   and activityid=30015\n" +
-                "$end;";
+                "$endif;";
 
         String rs = exprService.eval(sql, new HashMap<>());
         System.out.println(rs);
@@ -84,7 +84,7 @@ public class ExprTest extends BaseTest {
         params.put("woe", true);
         String sql =
                 "SELECT concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
-                        "FROM $if woe $then hive.woe.l_activity_taskcomplete_log $else hive.boe.l_activity_taskcomplete_log $end\n" +
+                        "FROM $if woe $then hive.woe.l_activity_taskcomplete_log $else hive.boe.l_activity_taskcomplete_log $endif\n" +
                         "WHERE concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                         "$if 1=1 $then \n" +
                         "\t1.0\n" +
@@ -98,13 +98,13 @@ public class ExprTest extends BaseTest {
                         "\t\t\t2.1.3\n" +
                         "\t\t$else\n" +
                         "\t\t\t2.1.4\n" +
-                        "\t\t\t$if 1==1 $then 2.1.4.1 $else 2.1.4.2 $end 2.1.4.3 $if 1>1 $then 2.1.4.4 $else 2.1.4.5 $end\n" +
+                        "\t\t\t$if 1==1 $then 2.1.4.1 $else 2.1.4.2 $endif 2.1.4.3 $if 1>1 $then 2.1.4.4 $else 2.1.4.5 $endif\n" +
                         "\t\t\t2.1.5\n" +
-                        "\t\t$end\n" +
+                        "\t\t$endif\n" +
                         "\t\t2.2\n" +
                         "\t$else\n" +
                         "\t\t2.3\n" +
-                        "\t$end\n" +
+                        "\t$endif\n" +
                         "  \t1.1\n" +
                         "$else\n" +
                         "   1.2\n" +
@@ -121,7 +121,7 @@ public class ExprTest extends BaseTest {
         params.put("woe", true);
         String sql =
                 "SELECT concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
-                        "FROM $if woe $then hive.woe.l_activity_taskcomplete_log $else hive.boe.l_activity_taskcomplete_log $end\n" +
+                        "FROM $if woe $then hive.woe.l_activity_taskcomplete_log $else hive.boe.l_activity_taskcomplete_log $endif\n" +
                         "WHERE concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                         "$if 1=1 $then \n" +
                         "\t1.0\n" +
@@ -135,7 +135,7 @@ public class ExprTest extends BaseTest {
                         "\t\t\t2.1.3\n" +
                         "\t\t$else\n" +
                         "\t\t\t2.1.4\n" +
-                        "\t\t\t$if 1==1 $then 2.1.4.1 $else 2.1.4.2 $end 2.1.4.3 $if 1>1 $then 2.1.4.4";
+                        "\t\t\t$if 1==1 $then 2.1.4.1 $else 2.1.4.2 $endif 2.1.4.3 $if 1>1 $then 2.1.4.4";
         System.out.println(sql);
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
@@ -146,9 +146,9 @@ public class ExprTest extends BaseTest {
         String sql ="var b=0,a=0;\n" +
                 "\n" +
                 "$if b=0 $then\n" +
-                "SELECT uid, $if b=0 $then ltid, $elif b>=2 $then citylvl, $else kid, $end level from mysql.inf.if_user_basic_u WHERE uid = 12807099 as ceshi1;\n" +
+                "SELECT uid, $if b=0 $then ltid, $elif b>=2 $then citylvl, $else kid, $endif level from mysql.inf.if_user_basic_u WHERE uid = 12807099 as ceshi1;\n" +
                 "SELECT * FROM mysql.inf.conf_mf_source LIMIT 10 as e4;\n" +
-                "$end\n" +
+                "$endif\n" +
                 "\n" +
                 "\n" +
                 "$if b>0 $then \n" +

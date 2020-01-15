@@ -121,7 +121,7 @@ public class ExprSectionTest extends BaseTest {
         String sql="select 1 from \n" +
                 "$if a=1 $then\n" +
                 "1.1 $ifnull($str(),'Null'), $ifnull($str('val'),'Null')\n" +
-                "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $end 1.1.3\n" +
+                "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $endif 1.1.3\n" +
                 "   <$ 'section'+a$> $str('1.1.4')\n"+
                 "$elif a=2 $then\n" +
                 "1.2\n" +
@@ -129,7 +129,7 @@ public class ExprSectionTest extends BaseTest {
                 "1.3\n" +
                 "$else\n" +
                 "1.4 <$ 'section'+a$> $str('1.4.1')\n" +
-                "$end\n" +
+                "$endif\n" +
                 "test";
         String rs = this.exprService.eval(sql, map);
         System.out.println(rs);

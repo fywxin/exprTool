@@ -17,7 +17,7 @@ public class BaseExpr implements Comparable<BaseExpr> {
     public static final String THEN = "then";
     public static final String ELSE = "else";
     public static final String ELIF = "elif";
-    public static final String ENDIF = "end";
+    public static final String ENDIF = "endif";
 
     public static final String FOR = "for";
     public static final String ENDFOR = "endfor";

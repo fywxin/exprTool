@@ -44,7 +44,7 @@ public class ExprForTest extends BaseTest {
                 "woe\n" +
                 "$else\n" +
                 "sd\n" +
-                "$end\n" +
+                "$endif\n" +
                 "3";
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
@@ -70,7 +70,7 @@ public class ExprForTest extends BaseTest {
                 "   1.1\n" +
                 "   $if 1==1 $then\n" +
                 "       1.1.<$i$>\n" +
-                "   $end\n" +
+                "   $endif\n" +
                 "   xx\n" +
                 "$endfor\n" +
                 "2\n" +
@@ -78,7 +78,7 @@ public class ExprForTest extends BaseTest {
                 "   woe\n" +
                 "$else\n" +
                 "   sd\n" +
-                "$end\n" +
+                "$endif\n" +
                 "3";
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
@@ -115,9 +115,9 @@ public class ExprForTest extends BaseTest {
                 "           1.1.i.1\n" +
                 "       $else\n" +
                 "           1.1.i.2\n" +
-                "       $end\n" +
+                "       $endif\n" +
                 "       1.2.i" +
-                "   $end\n" +
+                "   $endif\n" +
                 "   xx\n" +
                 "$endfor\n" +
                 "2\n" +
@@ -125,7 +125,7 @@ public class ExprForTest extends BaseTest {
                 "   woe\n" +
                 "$else\n" +
                 "   sd\n" +
-                "$end\n" +
+                "$endif\n" +
                 "3";
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
@@ -160,9 +160,9 @@ public class ExprForTest extends BaseTest {
                 "           1.1.<$i$>.1\n" +
                 "       $else\n" +
                 "           1.1.<$i$>.2\n" +
-                "       $end\n" +
+                "       $endif\n" +
                 "       1.2.<$i$>" +
-                "   $end\n" +
+                "   $endif\n" +
                 "   xx\n" +
                 "$endfor\n" +
                 "2\n" +
@@ -178,7 +178,7 @@ public class ExprForTest extends BaseTest {
                 "       sd2\n" +
                 "   $endfor\n" +
                 "   sd3" +
-                "$end\n" +
+                "$endif\n" +
                 "3";
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
@@ -290,7 +290,7 @@ public class ExprForTest extends BaseTest {
                 "       $for(j=0;j<3;j++)\n" +
                 "           x<$i$>_<$j$>\n" +
                 "       $endfor\n" +
-                "   $end\n" +
+                "   $endif\n" +
                 "   2\n" +
                 "$endfor\n" +
                 "ee";
