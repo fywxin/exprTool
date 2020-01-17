@@ -1,6 +1,7 @@
 package com.wjs.expr.bean;
 
 import com.wjs.expr.commons.ExprUtil;
+import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +25,7 @@ public class SectionExpr extends BaseExpr {
         super(text);
     }
 
-    public SectionExpr(String text, int startLine, int stopLine, int startCol, int stopCol) {
+    public SectionExpr(String text, Tuple3<Integer, Integer, Integer> startLine, Tuple3<Integer, Integer, Integer> stopLine, int startCol, int stopCol) {
         super(text);
         this.startLine = startLine;
         this.stopLine = stopLine;

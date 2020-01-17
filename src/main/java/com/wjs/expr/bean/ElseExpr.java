@@ -1,5 +1,6 @@
 package com.wjs.expr.bean;
 
+import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class ElseExpr extends BodyExpr{
 
-    public ElseExpr(String text, Integer startLine, Integer startCol) {
+    public ElseExpr(String text, Tuple3<Integer, Integer, Integer> startLine, Integer startCol) {
         super(text, startLine, startCol);
         this.setBodyStartCol(startCol+ELSE.length()+1);
     }

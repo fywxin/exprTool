@@ -48,14 +48,12 @@ public class ExprSectionTest extends BaseTest {
         String sql = "aa <$ a+\n1 $>ff";
         Map<String, Object> map = new HashMap<>();
         map.put("a", 1);
-        String rs = this.exprService.eval(sql, map);
-        System.out.println(rs);
-        Assert.assertTrue("aa 2ff".equals(rs));
+        Assert.assertThrows(ExprException.class, () -> this.exprService.eval(sql, map));
     }
 
     @Test
     public void testFuncAndSection1() {
-        String sql = "aa$str('1') <$ a+\n1 $>ff";
+        String sql = "aa$str('1') <$ a+1 $>ff";
         Map<String, Object> map = new HashMap<>();
         map.put("a", 1);
         String rs = this.exprService.eval(sql, map);

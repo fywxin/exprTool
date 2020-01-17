@@ -24,6 +24,18 @@ public class Tuple3<T1, T2, T3> {
         return (T3)this.get(2);
     }
 
+    public void setFirst(T1 first){
+        contents[0] = first;
+    }
+
+    public void setSecond(T2 second){
+        contents[1] = second;
+    }
+
+    public void setThird(T3 third){
+        contents[2] = third;
+    }
+
     public void update(T1 first, T2 second, T3 third) {
         contents = new Object[]{first, second, third};
     }

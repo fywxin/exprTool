@@ -20,6 +20,14 @@ public class Tuple2<T1, T2> {
         return (T2)this.get(1);
     }
 
+    public void setFirst(T1 first){
+        contents[0] = first;
+    }
+
+    public void setSecond(T2 second){
+        contents[1] = second;
+    }
+
     public void update(T1 first, T2 second){
         contents = new Object[]{first, second};
     }

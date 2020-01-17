@@ -1,5 +1,6 @@
 package com.wjs.expr.bean;
 
+import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class IfExpr extends ExprExpr {
 
-    public IfExpr(String text, Integer startLine, Integer startCol, Integer exprStartCol) {
+    public IfExpr(String text, Tuple3<Integer, Integer, Integer> startLine, Integer startCol, Integer exprStartCol) {
         super(text, startLine, startCol, exprStartCol);
     }
 

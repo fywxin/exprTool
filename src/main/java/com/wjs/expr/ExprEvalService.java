@@ -14,7 +14,7 @@ import static com.wjs.expr.bean.BaseExpr.INNER_SYMBOL;
 import static com.wjs.expr.bean.BaseExpr.NOT_NULL;
 
 /**
- * 表达式断言求知执行器
+ * 表达式断言求值执行器
  * @author wjs
  * @date 2020-01-02 10:22
  **/
@@ -114,6 +114,7 @@ public class ExprEvalService {
                     if (rs == null){
                         return castValue(paramStr.substring(i+2), clazz);
                     }
+                    return rs;
                 }catch (Exception e){
                     return castValue(paramStr.substring(i+2), clazz);
                 }

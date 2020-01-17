@@ -1,5 +1,6 @@
 package com.wjs.expr.bean;
 
+import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +19,7 @@ public class ExprExpr extends BodyExpr {
 
     public Integer exprStopCol;
 
-    public ExprExpr(String text, Integer startLine, Integer startCol, Integer exprStartCol) {
+    public ExprExpr(String text, Tuple3<Integer, Integer, Integer> startLine, Integer startCol, Integer exprStartCol) {
         super(text, startLine, startCol);
         this.exprStartCol = exprStartCol;
     }

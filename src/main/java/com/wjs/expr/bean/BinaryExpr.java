@@ -1,5 +1,6 @@
 package com.wjs.expr.bean;
 
+import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +39,7 @@ public class BinaryExpr extends BaseExpr {
         this.setStartCol(ifExpr.startCol);
     }
 
-    public BinaryExpr finish(Integer stopLine, Integer stopCol) {
+    public BinaryExpr finish(Tuple3<Integer, Integer, Integer> stopLine, Integer stopCol) {
         this.setStopLine(stopLine);
         this.setStopCol(stopCol);
         this.ok = true;
