@@ -17,8 +17,6 @@ public class SectionExpr extends BaseExpr {
 
     public static final Character SECTION_CLOSE = '>';
 
-    //默认值分割符号 !!
-    public static final Character SECTION_NULL_VALUE = '!';
     //默认值文本
     private String defaultValueSection = null;
 
@@ -39,7 +37,7 @@ public class SectionExpr extends BaseExpr {
         Character c = null;
         for (int i=startCol+2; i<stopCol-2; i++){
             c = text.charAt(i);
-            if (c == SECTION_NULL_VALUE && text.charAt(i+1) == SECTION_NULL_VALUE){
+            if (c == NOT_NULL && text.charAt(i+1) == NOT_NULL){
                 if (i+2 < stopCol-2) {
                     defaultValueSection = text.substring(i+2, stopCol-2);
                     break;

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 import static com.wjs.expr.bean.BaseExpr.INNER_SYMBOL;
+import static com.wjs.expr.bean.BaseExpr.NOT_NULL;
 
 /**
  * 表达式断言求知执行器
@@ -36,9 +37,8 @@ public class ExprEvalService {
                 String funcName = exprText.substring(0, start);
                 ExprFunction exprFunction = ExprFunction.get(funcName);
                 if (exprFunction != null && exprFunction instanceof ExprInnerFunction){
-                    ExprInnerFunction exprNativeFunc = (ExprInnerFunction)exprFunction;
                     String paramText = exprText.substring(start+1, end).trim();
-                    rs = (Boolean) exprNativeFunc.invoke(params, paramText);
+                    rs = (Boolean) this.evalInnerFunc((ExprInnerFunction)exprFunction, params, paramText, Boolean.class);
                     log.info("Inner func: {}({}) = {}", funcName, paramText, rs);
                     return rs;
                 }
@@ -100,9 +100,32 @@ public class ExprEvalService {
             return exprEval.call(funcExpr.getSectionText(), params);
         //内置快速方法
         }else {
-            ExprInnerFunction exprNativeFunc = (ExprInnerFunction)exprFunction;
-            return exprNativeFunc.invoke(params, funcExpr.getFuncParamStr());
+            return this.evalInnerFunc((ExprInnerFunction)exprFunction, params, funcExpr.getFuncParamStr(), Object.class);
         }
     }
 
+    private Object evalInnerFunc(ExprInnerFunction exprNativeFunc, Map<String, Object> params, String paramStr, Class clazz){
+        Character c = null;
+        for (int i=0; i<paramStr.length()-1; i++){
+            c = paramStr.charAt(i);
+            if (c == NOT_NULL && paramStr.charAt(i+1) == NOT_NULL){
+                try {
+                    Object rs = exprNativeFunc.invoke(params, paramStr.substring(0, i));
+                    if (rs == null){
+                        return castValue(paramStr.substring(i+2), clazz);
+                    }
+                }catch (Exception e){
+                    return castValue(paramStr.substring(i+2), clazz);
+                }
+            }
+        }
+        return exprNativeFunc.invoke(params, paramStr);
+    }
+
+    public Object castValue(String rs, Class clazz){
+        if (clazz == Boolean.class){
+            return "true".equalsIgnoreCase(rs) || "1".equals(rs);
+        }
+        return rs;
+    }
 }

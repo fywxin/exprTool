@@ -30,8 +30,18 @@ public class Copy {
                 String descTmp = descDir+f.getName()+"/";
                 new File(descTmp).mkdirs();
                 for (File file : f.listFiles()){
-                    if (!ignore.contains(file.getName())){
-                        out(file.getAbsolutePath(), descTmp+file.getName(), srcPkg, descPkg);
+                    if (file.isDirectory()){
+                        String descTmp2 = descTmp+file.getName()+"/";
+                        new File(descTmp2).mkdirs();
+                        for (File ff : file.listFiles()){
+                            if (!ignore.contains(ff.getName())){
+                                out(ff.getAbsolutePath(), descTmp2+ff.getName(), srcPkg, descPkg);
+                            }
+                        }
+                    }else{
+                        if (!ignore.contains(file.getName())){
+                            out(file.getAbsolutePath(), descTmp+file.getName(), srcPkg, descPkg);
+                        }
                     }
                 }
             }
