@@ -23,6 +23,6 @@ public class IfNullFunc extends AbstractExprFunc {
 
     @Override
     public String name() {
-        return "ifnull";
+        return "ifNull";
     }
 }

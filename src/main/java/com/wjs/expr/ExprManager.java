@@ -30,12 +30,15 @@ public class ExprManager extends ExprService {
         exprEvalService.exprNativeService = sqlExprNativeService;
     }
 
-    public void registerFunc(ExprFunction func){
+    public ExprManager registerFunc(ExprFunction func){
         aviatorEval.registerFunc(func);
+        ExprFunction.register(func);
+        return this;
     }
 
-    public void addForInListener(IForInListener listener){
+    public ExprManager addForInListener(IForInListener listener){
         forInListenerList.add(listener);
+        return this;
     }
 
     public static class ExprServiceHolder{

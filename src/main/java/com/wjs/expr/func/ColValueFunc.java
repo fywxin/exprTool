@@ -13,13 +13,12 @@ public class ColValueFunc extends AbstractExprFunc {
 
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
-        if (arg1.getAviatorType() != AviatorType.JavaType || arg2.getAviatorType() != AviatorType.String || arg3.getAviatorType() != AviatorType.Long) {
-            throw new ExprException("Func colValue({stepId}, '{colName}', Number) param type error, Use colValue(e1, 'id', 1)");
-        }
+//        if (arg1.getAviatorType() != AviatorType.JavaType || arg2.getAviatorType() != AviatorType.String || arg3.getAviatorType() != AviatorType.Long) {
+//            throw new ExprException("Func colValue({stepId}, '{colName}', Number) param type error, Use colValue(e1, 'id', 1)");
+//        }
         AviatorJavaType obj = (AviatorJavaType)arg1;
         String stepId = obj.getName().trim();
-        AviatorString str = (AviatorString)arg2;
-        String col = str.getLexeme();
+        String col = getString(arg2);
         AviatorLong line = (AviatorLong)arg3;
         long num = line.longValue();
 

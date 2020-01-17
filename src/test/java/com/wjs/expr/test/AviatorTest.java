@@ -180,6 +180,9 @@ public class AviatorTest extends BaseTest {
         env.put("x", 1);
         env.put("y", 2);
         env.put("z", 3);
+        User user = new User();
+        user.setName("dsdas");
+        env.put("user", user);
 
         AviatorEvaluator.defineFunction("test","lambda(x) -> lambda(y) -> lambda(z) -> x + y + z end end end");
         System.out.println(AviatorEvaluator.execute("test(4)(5)(6)", env)); // output 15
@@ -187,20 +190,11 @@ public class AviatorTest extends BaseTest {
         env.put("a", 4);
         System.out.println(AviatorEvaluator.execute("test(4)(5)(6) + a", env)); // output 19
 
-        System.out.println(AviatorEvaluator.execute("a++", env));
+        //System.out.println(AviatorEvaluator.execute("a++", env));
+        System.out.println(AviatorEvaluator.execute("user.age==nil", env));
+        System.out.println(AviatorEvaluator.execute("user1==nil", env));
+        //System.out.println(AviatorEvaluator.execute("user1.age==nil", env));
+        System.out.println(AviatorEvaluator.execute("string.length(user.name)", env));
     }
 
-    @Getter
-    @Setter
-    public static class User{
-
-        public String name;
-
-        private Integer age;
-
-        public User(String name, Integer age) {
-            this.name = name;
-            this.age = age;
-        }
-    }
 }

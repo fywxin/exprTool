@@ -31,6 +31,10 @@ public class BaseExpr implements Comparable<BaseExpr> {
     public static final String _FOR = GRAMMAR + FOR;
     public static final String _ENDFOR  = GRAMMAR + ENDFOR;
 
+    public static final Character INNNER = '_';
+
+    public static final String INNER_SYMBOL = String.valueOf(GRAMMAR)+INNNER;
+
     //原始表达式语句
     public String text;
 

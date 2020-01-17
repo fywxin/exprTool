@@ -120,7 +120,7 @@ public class ExprSectionTest extends BaseTest {
         map.put("a", 1);
         String sql="select 1 from \n" +
                 "$if a=1 $then\n" +
-                "1.1 $ifnull($str(),'Null'), $ifnull($str('val'),'Null')\n" +
+                "1.1 $ifNull($str(),'Null'), $ifNull($str('val'),'Null')\n" +
                 "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $endif 1.1.3\n" +
                 "   <$ 'section'+a$> $str('1.1.4')\n"+
                 "$elif a=2 $then\n" +
@@ -140,5 +140,25 @@ public class ExprSectionTest extends BaseTest {
                 "   section1 Arg_1.1.4\n" +
                 "\n" +
                 "test").equals(rs));
+    }
+
+    @Test
+    public void testDefaultVal1(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", 1);
+        String sql = "aa <$ b!!BB $> cc";
+        String rs = this.exprService.eval(sql, map);
+        System.out.println(rs);
+        Assert.assertTrue("aa BB cc".equals(rs));
+    }
+
+    @Test
+    public void testDefaultVal2(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", 1);
+        String sql = "aa <$ b !! BB $>cc aa <$ b !!' BB '$>cc <$ a !!' BB '$>";
+        String rs = this.exprService.eval(sql, map);
+        System.out.println(rs);
+        Assert.assertTrue("aa BBcc aa  BB cc 1".equals(rs));
     }
 }

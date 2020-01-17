@@ -2,10 +2,8 @@ package com.wjs.expr.test;
 
 import com.wjs.expr.ExprGrammarService;
 import com.wjs.expr.ExprManager;
-import com.wjs.expr.func.ColValueFunc;
-import com.wjs.expr.func.IfNullFunc;
-import com.wjs.expr.func.StrFunc;
-import com.wjs.expr.func.TestFunc;
+import com.wjs.expr.func.*;
+import com.wjs.expr.func.inner.InnerIsNullFunc;
 import org.junit.Before;
 
 /**
@@ -24,5 +22,8 @@ public class BaseTest {
         exprService.registerFunc(new IfNullFunc());
         exprService.registerFunc(new TestFunc());
         exprService.registerFunc(new ColValueFunc());
+        exprService.registerFunc(new IsNullFunc());
+        exprService.registerFunc(new IsNotNullFunc());
+        exprService.registerFunc(new InnerIsNullFunc());
     }
 }

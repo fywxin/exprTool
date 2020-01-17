@@ -1,11 +1,7 @@
 package com.wjs.expr.bean;
 
-import com.wjs.expr.ExprFunction;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 用户自定义方法混入
@@ -15,8 +11,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class FuncExpr extends SectionExpr {
-
-    public static final Set<String> funcSet = new HashSet<>();
 
     //是否稳幂等, 不随执行次数与上线文而改变
     public boolean idempotent = false;
@@ -34,11 +28,19 @@ public class FuncExpr extends SectionExpr {
         return text.substring(startCol, stopCol);
     }
 
-    public static boolean support(String funcName) {
-        return funcSet.contains(funcName);
+    /**
+     * 返回方法名称
+     * @return
+     */
+    public String getFuncName(){
+        return text.substring(startCol, text.indexOf('(', startCol)).trim();
     }
 
-    public static void add(ExprFunction func) {
-        funcSet.add(func.funcName());
+    /**
+     * 返回方法参数内容
+     * @return
+     */
+    public String getFuncParamStr(){
+        return text.substring(text.indexOf('(', startCol)+1, stopCol-1).trim();
     }
 }

@@ -208,7 +208,7 @@ public class ExprGrammarService {
                         break;
                     default:
                         //自定义函数 -> 函数嵌套
-                        if (FuncExpr.support(BaseExpr.GRAMMAR + frame)){
+                        if (ExprFunction.support(BaseExpr.GRAMMAR + frame)){
                             int j = i + frame.length();
                             while (text.charAt(j) == ' '){
                                 j++;

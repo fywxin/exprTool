@@ -51,7 +51,6 @@ public class AviatorEval implements ExprEval {
         if (func instanceof AbstractFunction){
             AbstractFunction afunc = (AbstractFunction)func;
             aviator.addFunction(afunc);
-            FuncExpr.add(func);
         }
     }
 
