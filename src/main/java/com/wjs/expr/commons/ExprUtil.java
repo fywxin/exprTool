@@ -6,6 +6,37 @@ package com.wjs.expr.commons;
  **/
 public class ExprUtil {
 
+    public static void fillLine(StringBuilder sb, Integer count){
+        while (count > 0){
+            sb.append("\n");
+            count--;
+        }
+    }
+
+    /**
+     * 是否展示的为空白内容
+     * @param text
+     * @param start
+     * @param end
+     * @return
+     */
+    public static boolean isWhite(String text, int start, int end){
+        if (start >= end){
+            return true;
+        }
+        if (start+1 == end && text.charAt(start) == '\n'){
+            return true;
+        }
+        Character c = null;
+        for (int i=start; i<end; i++){
+            c = text.charAt(i);
+            if (c != ' ' && c != '\t'){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean isNumeric (String str) {
         if (isBlank(str)){
             return false;

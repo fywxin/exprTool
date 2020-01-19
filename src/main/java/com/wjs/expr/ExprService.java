@@ -31,7 +31,7 @@ public class ExprService {
      */
     public String eval(String text, Map<String, Object> params){
         ExprTree exprTree = this.parse(text, params);
-        return eval(text, exprTree, 0, text.length());
+        return eval(text, exprTree, 0, text.length()-1);
     }
 
     public ExprTree parse(String text, Map<String, Object> params){
@@ -42,7 +42,7 @@ public class ExprService {
 
     public String eval(String text, ExprTree exprTree, int startCol, int stopCol){
         if (exprTree.isEmpty()){
-            return text.substring(startCol, stopCol);
+            return text.substring(startCol, stopCol+1);
         }
         StringBuilder sb = new StringBuilder(stopCol-startCol);
         this.evalExpr(text, exprTree, sb, startCol, stopCol);
@@ -57,6 +57,7 @@ public class ExprService {
             evalSection(text, exprTree, start, baseExpr.startCol, sb);
             if (baseExpr instanceof ForExpr){
                 ForExpr forExpr = (ForExpr) baseExpr;
+
                 subExprTree = exprTree.getSubExprTree(forExpr, forExpr.bodyStartCol, forExpr.bodyStopCol);
                 this.evalFor(text, subExprTree, sb, forExpr);
             }else{
@@ -88,10 +89,10 @@ public class ExprService {
                 }
             }
 
-            start = baseExpr.stopCol;
+            start = baseExpr.stopCol+1;
         }
         if (start < stop){
-            evalSection(text, exprTree, start, stop, sb);
+            evalSection(text, exprTree, start, stop+1, sb);
         }
     }
 
@@ -223,4 +224,11 @@ public class ExprService {
 
     //---------------------------------------------------------------
 
+    public static void main(String[] args) {
+        String a ="0123456";
+        StringBuilder sb = new StringBuilder();
+        sb.append(a, 1,3);
+        System.out.println(sb.toString());
+        System.out.println(a.substring(1,3));
+    }
 }

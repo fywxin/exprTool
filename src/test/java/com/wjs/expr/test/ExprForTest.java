@@ -11,8 +11,9 @@ import java.util.*;
  **/
 public class ExprForTest extends BaseTest {
 
+
     @Test
-    public void test1(){
+    public void test1Thin(){
         Map<String, Object> params = new HashMap<>();
         params.put("woe", true);
 
@@ -26,7 +27,6 @@ public class ExprForTest extends BaseTest {
         Assert.assertTrue(("dd\n" +
                 "xx\n" +
                 "xx\n" +
-                "\n" +
                 "ee").equals(rs));
     }
 

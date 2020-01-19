@@ -1,6 +1,5 @@
 package com.wjs.expr.bean;
 
-import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,9 +16,16 @@ public class BodyExpr extends BaseExpr {
 
     public Integer bodyStopCol;
 
-    public BodyExpr(String text, Tuple3<Integer, Integer, Integer> startLine, Integer startCol) {
+    //public Integer thinBodyStartCol;
+
+    public BodyExpr(String text, Line startLine, Integer startCol) {
         super(text);
         this.setStartLine(startLine);
         this.setStartCol(startCol);
+    }
+
+    public void setBodyStartCol(Integer bodyStartCol) {
+        this.bodyStartCol = bodyStartCol;
+        //this.thinBodyStartCol = passBlank(text, bodyStartCol);
     }
 }

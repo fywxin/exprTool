@@ -33,11 +33,12 @@ public class ForExpr extends BodyExpr {
 
     public Tuple2<String, String> inState;
 
-    public ForExpr(String text, Tuple3<Integer, Integer, Integer> startLine, Integer startCol, Integer bodyStartCol) {
+    public ForExpr(String text, Line startLine, Integer startCol, Integer bodyStartCol) {
         super(text, startLine, startCol);
         this.bodyStartCol = bodyStartCol;
+        //this.bodyStartCol = passBlank(text, bodyStartCol);
         int left = text.indexOf('(', startCol);
-        int right = bodyStartCol;
+        int right = this.bodyStartCol+1;
         Character c = text.charAt(right);
         while (c != ')' && right > left){
             right--;
@@ -70,7 +71,7 @@ public class ForExpr extends BodyExpr {
         }
     }
 
-    public ForExpr finish(Tuple3<Integer, Integer, Integer> stopLine, Integer stopCol, Integer bodyStopCol) {
+    public ForExpr finish(Line stopLine, Integer stopCol, Integer bodyStopCol) {
         this.setStopLine(stopLine);
         this.setStopCol(stopCol);
         this.setBodyStopCol(bodyStopCol);

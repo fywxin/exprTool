@@ -1,7 +1,6 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
-import com.wjs.expr.commons.Tuple3;
 import com.wjs.expr.exprNative.ExprNativeService;
 
 import java.util.ArrayList;
@@ -10,6 +9,10 @@ import java.util.Optional;
 
 /**
  * 表达式语法解析器
+ * 规则：
+ *  start 匹配字符串的开始位置
+ *  stop 匹配字符串的结束位置
+ *  subString(start, stop+1)
  * @author wjs
  * @date 2019-12-31 17:51
  **/
@@ -28,29 +31,27 @@ public class ExprGrammarService {
         Character n = null;
         String frame = null;
         String cmd = null;
-        int lineNum = 0;
-        Tuple3<Integer, Integer, Integer> line = null;
 
         List<BinaryExpr> list= new ArrayList<>();
         List<FuncExpr> funcExprList = new ArrayList<>();
         List<SectionExpr> sectionExprList = new ArrayList<>();
         List<ForExpr> forExprList = new ArrayList<>();
-        List<Tuple3<Integer, Integer, Integer>> lines = new ArrayList<>();
 
         //待解析的表达式栈
         List<BinaryExpr> ifStack= new ArrayList<>();
         List<ForExpr> forStack= new ArrayList<>();
         BinaryExpr binaryExpr = null;
 
+        List<Line> lines = new ArrayList<>();
+        Line line = new Line(0, 0);
+        lines.add(line);
+
         for (int i=0; i<text.length(); i++) {
             c = text.charAt(i);
             if (c == '\n'){
-                if (lineNum > 0){
-                    lines.get(lineNum-1).setThird(i-1);
-                }
-                line = new Tuple3<>(lineNum, i, null);
+                lines.get(lines.size()-1).setStop(i);
+                line = new Line(lines.size(), i+1);
                 lines.add(line);
-                lineNum++;
                 continue;
             }
 
@@ -64,34 +65,33 @@ public class ExprGrammarService {
                         n = text.charAt(i+1);
                         while (!(c == BaseExpr.GRAMMAR && n == SectionExpr.SECTION_CLOSE)){
                             if (c == SectionExpr.SECTION_OPEN && n == BaseExpr.GRAMMAR){
-                                throw new ExprException("第["+(lineNum+1)+" | "+(lineNum+1)+"]行, 区间["+startCol+"-"+(i+2)+"] 片段表达式不支持循环嵌套:\n"+text.substring(startCol, i+2));
+                                throw new ExprException(line.info(i+2)+"片段表达式不支持循环嵌套:\n"+text.substring(startCol, i+2));
                             }
                             if (c == '\n'){
-                                throw new ExprException("第["+lineNum+"]行, 区间["+startCol+"-"+(i+2)+"]片段不支持换行");
+                                throw new ExprException(line.info(i+2)+"片段不支持换行");
                             }
                             i++;
                             c = text.charAt(i);
                             n = text.charAt(i+1);
                         }
-                        i++;
+                        //i+1 == '>'
                         sectionExprList.add(new SectionExpr(text, line, line, startCol, i+1));
                         continue;
                     }catch (Exception e){
                         if (e instanceof ExprException){
                             throw e;
                         }
-                        throw new ExprException("第["+(lineNum+1)+" - "+(lineNum+1)+"]行, 区间["+startCol+"-"+i+"] 片段表达式解析异常:\n"+text.substring(startCol, i-1), e);
+                        throw new ExprException(line.info(i)+"片段表达式解析异常:\n"+text.substring(startCol, i-1), e);
                     }
                 }
             }
 
             if (c == BaseExpr.GRAMMAR){
-                i++;
-                frame = getWord(text, i);
+                frame = getWord(text, i+1);
                 cmd = frame.toLowerCase();
                 switch (cmd){
                     case BaseExpr.IF:
-                        binaryExpr = new BinaryExpr(new IfExpr(text, line, i - 1, i + BaseExpr.IF.length()));
+                        binaryExpr = new BinaryExpr(new IfExpr(text, line, i, i + BaseExpr._IF.length()));
                         //父表达式 -> 栈上最近一个未完成的表达式
                         for (int j=ifStack.size()-1; j>=0; j--){
                             if (!ifStack.get(j).isOk()){
@@ -109,18 +109,18 @@ public class ExprGrammarService {
                             IfExpr ifExpr = binaryExpr.ifExpr;
                             if (ifExpr.getExprStopCol() == null){
                                 ifExpr.setExprStopCol(i-1);
-                                ifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
+                                ifExpr.setBodyStartCol(i+BaseExpr._THEN.length());
                             }else{
-                                throw new ExprException("第["+line+"]行的 "+BaseExpr._THEN+" 缺少匹配的 "+BaseExpr._IF);
+                                throw new ExprException(line.info(i)+BaseExpr._THEN+" 缺少匹配的 "+BaseExpr._IF);
                             }
                         //elif
                         } else {
                             ElifExpr elifExpr = binaryExpr.lastElifExpr();
                             if (elifExpr.getExprStopCol() == null){
                                 elifExpr.setExprStopCol(i-1);
-                                elifExpr.setBodyStartCol(i+BaseExpr.THEN.length());
+                                elifExpr.setBodyStartCol(i+BaseExpr._THEN.length());
                             }else{
-                                throw new ExprException("第["+line+"]行的 "+BaseExpr._THEN+" 缺少匹配的 "+BaseExpr._ELIF);
+                                throw new ExprException(line.info(i)+BaseExpr._THEN+" 缺少匹配的 "+BaseExpr._ELIF);
                             }
                         }
                         break;
@@ -132,7 +132,7 @@ public class ExprGrammarService {
                         } else {
                             endElIfExpr(binaryExpr, line, i);
                         }
-                        binaryExpr.addElifExpr(new ElifExpr(text, line, i-1, i+BaseExpr.ELIF.length()));
+                        binaryExpr.addElifExpr(new ElifExpr(text, line, i, i+BaseExpr._ELIF.length()));
                         break;
                     case BaseExpr.ELSE:
                         this.checkIf(ifStack, line);
@@ -143,7 +143,7 @@ public class ExprGrammarService {
                             endElIfExpr(binaryExpr, line, i);
                         }
 
-                        binaryExpr.setElseExpr(Optional.of(new ElseExpr(text, line, i-1)));
+                        binaryExpr.setElseExpr(Optional.of(new ElseExpr(text, line, i)));
                         break;
                     case BaseExpr.ENDIF:
                         this.checkIf(ifStack, line);
@@ -164,26 +164,20 @@ public class ExprGrammarService {
                         list.add(binaryExpr);
                         break;
                     case BaseExpr.FOR:
-                        int start = i-1;
+                        int start = i;
                         int loop = 1;
-                        i = i+BaseExpr.FOR.length();
+                        i = i+BaseExpr.FOR.length()+1;
                         n = text.charAt(i);
-                        if (n != '(') {
-                            while (i < text.length() - 1) {
-                                i++;
-                                n = text.charAt(i);
-                                if (n == '('){
-                                    break;
-                                }
-                                if (n != ' ' && n != '\t') {
-                                    throw new ExprException("第[" + (lineNum+1) + "]行 " + BaseExpr._FOR + " 区间[" + start + " - " + i + "] 表达式格式错误: "+text.substring(start, i+1));
-                                }
+                        while (i < text.length() - 1 && n != '(') {
+                            i++;
+                            n = text.charAt(i);
+                            if (n != ' ' && n != '\t') {
+                                throw new ExprException(line.info(i)+BaseExpr._FOR + " 表达式格式错误: "+text.substring(start, i+1));
                             }
                         }
-                        i++;
                         while (loop > 0 && i < text.length()-1){
-                            n = text.charAt(i);
                             i++;
+                            n = text.charAt(i);
                             if (n == '('){
                                 loop++;
                             }
@@ -191,17 +185,17 @@ public class ExprGrammarService {
                                 loop--;
                             }
                             if (n == '\n'){
-                                throw new ExprException("第["+(lineNum+1)+"]行 "+BaseExpr._FOR+" 区间["+start+" - "+i+"] 不支持换行: "+text.substring(start, i+1));
+                                throw new ExprException(line.info(i)+BaseExpr._FOR+" 不支持换行: "+text.substring(start, i+1));
                             }
                         }
                         if (loop > 0){
-                            throw new ExprException("第["+(lineNum+1)+"]行 "+BaseExpr._FOR+" 区间["+start+" - "+i+"] 找不到循环表达式结束右括号 ) : "+text.substring(start, i+1));
+                            throw new ExprException(line.info(i)+BaseExpr._FOR+" 找不到循环表达式结束右括号 ) : "+text.substring(start, i+1));
                         }
                         forStack.add(new ForExpr(text, line, start, i+1));
                         break;
                     case BaseExpr.ENDFOR:
                         if (forStack.isEmpty()){
-                            throw new ExprException("第["+(lineNum+1)+"]行 "+BaseExpr._ENDFOR+" 找不到匹配的 "+BaseExpr._FOR);
+                            throw new ExprException(line.info(i)+ BaseExpr._ENDFOR+" 找不到匹配的 "+BaseExpr._FOR);
                         }
                         ForExpr forExpr = forStack.remove(forStack.size()-1).finish(line, i+BaseExpr.ENDFOR.length(), i-1);
                         //for 是IF的子节点
@@ -213,7 +207,7 @@ public class ExprGrammarService {
                     default:
                         //自定义函数 -> 函数嵌套
                         if (ExprFunction.support(BaseExpr.GRAMMAR + frame)){
-                            int j = i + frame.length();
+                            int j = i + frame.length() + 1;
                             while (text.charAt(j) == ' '){
                                 j++;
                             }
@@ -229,10 +223,10 @@ public class ExprGrammarService {
                                         loop--;
                                     }
                                     if (cc == '\n'){
-                                        throw new ExprException("第["+lineNum+"]行, 区间["+i+"-"+(j)+"]片段不支持换行");
+                                        throw new ExprException(line.info(j)+ "函数片段不支持换行");
                                     }
                                 }
-                                funcExprList.add(new FuncExpr(text, line, line, i-1, j+1));
+                                funcExprList.add(new FuncExpr(text, line, line, i, j));
                                 i = j;
                             }
                         }
@@ -240,10 +234,10 @@ public class ExprGrammarService {
                 }
             }
         }
-        line.setThird(text.length());
+        line.setStop(text.length()-1);
 
         if (!forStack.isEmpty()){
-            throw new ExprException("缺失第[" + (forStack.get(0).getStartLine().getFirst() + 1) + "]行 "+BaseExpr._FOR+" 对应的 "+BaseExpr._ENDFOR+", 未闭合错误");
+            throw new ExprException(line.info()+"缺失 "+BaseExpr._FOR+" 对应的 "+BaseExpr._ENDFOR+", 未闭合错误");
         }
 
         if (autoComplete){
@@ -267,40 +261,40 @@ public class ExprGrammarService {
             }
         }else {
             if (!ifStack.isEmpty()) {
-                throw new ExprException("缺失第[" + (ifStack.get(0).getStartLine().getFirst() + 1) + "]行 "+BaseExpr._IF+" 对应的 "+BaseExpr._ENDIF+", 未闭合错误");
+                throw new ExprException(line.info()+" 缺失 "+BaseExpr._IF+" 对应的 "+BaseExpr._ENDIF+", 未闭合错误");
             }
         }
 
         return new ExprTree(list, funcExprList, sectionExprList, forExprList, 0, text.length(), null);
     }
 
-    private void checkIf(List<BinaryExpr> ifStack, Tuple3<Integer, Integer, Integer> line){
+    private void checkIf(List<BinaryExpr> ifStack, Line line){
         if (ifStack.isEmpty() || ifStack.get(ifStack.size()-1).ifExpr == null) {
-            throw new ExprException("第["+line+"]行之上, 缺少 "+BaseExpr._IF+" 关键字");
+            throw new ExprException(line.info()+"之上, 缺失 "+BaseExpr._IF+" 关键字");
         }
     }
 
-    private void endIfExpr(BinaryExpr binaryExpr, Tuple3<Integer, Integer, Integer> line, int i) {
+    private void endIfExpr(BinaryExpr binaryExpr, Line line, int i) {
         IfExpr ifExpr = binaryExpr.ifExpr;
         if (ifExpr.getBodyStartCol() == null){
-            throw new ExprException("第["+(ifExpr.getStartLine().getFirst()+1)+"]行 "+BaseExpr._IF+" 缺少 "+BaseExpr._THEN+" 关键字");
+            throw new ExprException(line.info()+BaseExpr._IF+" 缺失 "+BaseExpr._THEN+" 关键字");
         }
         ifExpr.setStopLine(line);
         ifExpr.setBodyStopCol(i-1);
         ifExpr.setStopCol(i-1);
     }
 
-    private void endElIfExpr(BinaryExpr binaryExpr, Tuple3<Integer, Integer, Integer> line, int i){
+    private void endElIfExpr(BinaryExpr binaryExpr, Line line, int i){
         ElifExpr elifExpr = binaryExpr.lastElifExpr();
         if (elifExpr.getBodyStartCol() == null){
-            throw new ExprException("第["+(elifExpr.getStartLine().getFirst()+1)+"]行 "+BaseExpr._ELIF+" 缺少 "+BaseExpr._THEN+" 关键字");
+            throw new ExprException(line.info()+BaseExpr._ELIF+" 缺失 "+BaseExpr._THEN+" 关键字");
         }
         elifExpr.setStopLine(line);
         elifExpr.setBodyStopCol(i-1);
         elifExpr.setStopCol(i-1);
     }
 
-    private void endElse(BinaryExpr binaryExpr, Tuple3<Integer, Integer, Integer> line, int i) {
+    private void endElse(BinaryExpr binaryExpr, Line line, int i) {
         ElseExpr elseExpr = binaryExpr.elseExpr.get();
         elseExpr.setStopLine(line);
         elseExpr.setBodyStopCol(i-1);

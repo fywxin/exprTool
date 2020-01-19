@@ -42,8 +42,8 @@ public class Tuple3<T1, T2, T3> {
 
     @Override
     public String toString() {
-        return "{1. " + contents[0] +
-                ", 2. "+ contents[1] +
-                ", 3. "+ contents[2] + "}\n";
+        return "{" + contents[0] +
+                ", "+ contents[1] +
+                ", "+ contents[2] + "}\n";
     }
 }

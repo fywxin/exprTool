@@ -1,6 +1,5 @@
 package com.wjs.expr.bean;
 
-import com.wjs.expr.commons.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,10 +41,10 @@ public class BaseExpr implements Comparable<BaseExpr> {
     //原始表达式语句
     public String text;
 
-    //<行号，行开始位置索引，行结束位置索引>
-    public Tuple3<Integer, Integer, Integer> startLine;
+    //<行号，行开始位置索引，行结束位置索引, 是否空行>
+    public Line startLine;
 
-    public Tuple3<Integer, Integer, Integer> stopLine;
+    public Line stopLine;
 
     public Integer startCol;
 
@@ -87,5 +86,23 @@ public class BaseExpr implements Comparable<BaseExpr> {
     @Override
     public int compareTo(BaseExpr other) {
         return this.startCol - other.startCol;
+    }
+
+    /**
+     * 删除空行影响
+     * @param text
+     * @param start
+     * @return
+     */
+    public int passBlank(String text, int start){
+        int index = start;
+        while (text.charAt(index) == ' '){
+            index++;
+        }
+        if (text.charAt(index) == '\n'){
+            index++;
+            start = index;
+        }
+        return start;
     }
 }

@@ -34,6 +34,6 @@ public class Tuple2<T1, T2> {
 
     @Override
     public String toString() {
-        return "1. "+contents[0]+", 2. "+contents[1];
+        return "["+contents[0]+", "+contents[1]+"]";
     }
 }
