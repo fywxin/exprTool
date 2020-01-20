@@ -1,6 +1,7 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
+import com.wjs.expr.commons.ReflectionUtil;
 import com.wjs.expr.eval.ExprEval;
 import com.wjs.expr.listener.IForInListener;
 import lombok.extern.slf4j.Slf4j;
@@ -138,7 +139,20 @@ public class ExprService {
                 params.put(key, oldVal);
             }
         }else{
-            Object target = params.get(forExpr.getInState().getSecond());
+            Object target = null;
+            String inTmp = forExpr.getInState().getSecond();
+            if (inTmp.contains(".")){
+                List<String> frames = Arrays.asList(inTmp.split("\\."));
+                target = params.get(frames.get(0));
+                for (int i=1; i<frames.size(); i++){
+                    if (target != null) {
+                        target = ReflectionUtil.getPojoFieldValue(target, frames.get(i));
+                    }
+                }
+            }else{
+                target = params.get(forExpr.getInState().getSecond());
+            }
+
             String key = forExpr.getInState().getFirst();
             Object oldVal = params.get(key);
             String key_index = key+"_INDEX";

@@ -1,6 +1,7 @@
 package com.wjs.expr.exprNative;
 
 import com.wjs.expr.ExprException;
+import com.wjs.expr.bean.BaseExpr;
 
 /**
  * Sql 方言处理器
@@ -89,6 +90,6 @@ public class SqlExprNativeService implements ExprNativeService {
 
     @Override
     public boolean isSplitChar(Character c) {
-        return c == ' ' || c == '\n' || c == '\t' || c == ',' || c == ';' || c == '(' || c == ')' || c == '=';
+        return c == ' ' || c == '\n' || c == '\t' || c == BaseExpr.GRAMMAR || c == ',' || c == ';' || c == '(' || c == ')' || c == '=' || c == '}' || c == '{';
     }
 }
