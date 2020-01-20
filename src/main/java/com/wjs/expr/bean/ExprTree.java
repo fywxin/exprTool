@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ExprTree {
 
+    public String text;
+
     public List<BinaryExpr> binaryExprList;
 
     public List<FuncExpr> funcExprList;
@@ -43,8 +45,8 @@ public class ExprTree {
     public Map<String, Object> params;
 
 
-
-    public ExprTree(List<BinaryExpr> binaryExprList, List<FuncExpr> funcExprList, List<SectionExpr> sectionExprList, List<ForExpr> forExprList, Integer startCol, Integer stopCol, BaseExpr parent) {
+    public ExprTree(String text, List<BinaryExpr> binaryExprList, List<FuncExpr> funcExprList, List<SectionExpr> sectionExprList, List<ForExpr> forExprList, Integer startCol, Integer stopCol, BaseExpr parent) {
+        this.text = text;
         this.binaryExprList = binaryExprList;
         this.funcExprList = funcExprList;
         this.sectionExprList = sectionExprList;
@@ -63,6 +65,7 @@ public class ExprTree {
      */
     public ExprTree getSubExprTree(BaseExpr baseExpr, int startCol, int stopCol){
         ExprTree subExprTree = new ExprTree();
+        subExprTree.setText(this.text);
         subExprTree.setBinaryExprList(this.binaryExprList.stream().filter(x -> x.in(startCol, stopCol)).collect(Collectors.toList()));
         subExprTree.setFuncExprList(this.funcExprList.stream().filter(x -> x.in(startCol, stopCol)).collect(Collectors.toList()));
         subExprTree.setSectionExprList(this.sectionExprList.stream().filter(x -> x.in(startCol, stopCol)).collect(Collectors.toList()));

@@ -35,11 +35,11 @@ public class SectionExpr extends BaseExpr {
     public String getSectionText(){
         StringBuilder sb = new StringBuilder(stopCol-startCol-4);
         Character c = null;
-        for (int i=startCol+2; i<stopCol-2; i++){
+        for (int i=startCol+2; i<stopCol-1; i++){
             c = text.charAt(i);
             if (c == NOT_NULL && text.charAt(i+1) == NOT_NULL){
-                if (i+2 < stopCol-2) {
-                    defaultValueSection = text.substring(i+2, stopCol-2);
+                if (i+2 < stopCol-1) {
+                    defaultValueSection = text.substring(i+2, stopCol-1);
                     break;
                 }
             }

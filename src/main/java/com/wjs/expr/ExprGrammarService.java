@@ -265,7 +265,7 @@ public class ExprGrammarService {
             }
         }
 
-        return new ExprTree(list, funcExprList, sectionExprList, forExprList, 0, text.length(), null);
+        return new ExprTree(text, list, funcExprList, sectionExprList, forExprList, 0, text.length(), null);
     }
 
     private void checkIf(List<BinaryExpr> ifStack, Line line){

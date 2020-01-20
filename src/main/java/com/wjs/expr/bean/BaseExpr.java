@@ -80,7 +80,7 @@ public class BaseExpr implements Comparable<BaseExpr> {
 
     @Override
     public String toString() {
-        return text.substring(startCol, stopCol);
+        return text.substring(startCol, stopCol+1);
     }
 
     @Override
