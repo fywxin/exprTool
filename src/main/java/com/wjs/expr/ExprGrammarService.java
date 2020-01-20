@@ -171,7 +171,7 @@ public class ExprGrammarService {
                         while (i < text.length() - 1 && n != '(') {
                             i++;
                             n = text.charAt(i);
-                            if (n != ' ' && n != '\t') {
+                            if (n != ' ' && n != '\t' && n != '(') {
                                 throw new ExprException(line.info(i)+BaseExpr._FOR + " 表达式格式错误: "+text.substring(start, i+1));
                             }
                         }

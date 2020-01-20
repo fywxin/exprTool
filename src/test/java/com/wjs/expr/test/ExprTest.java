@@ -60,20 +60,13 @@ public class ExprTest extends BaseTest {
 
         String rs = exprService.eval(sql, new HashMap<>());
         System.out.println(rs);
-        Assert.assertTrue(("\n" +
-                "   and activityid=30015\n" +
-                "\n" +
+        Assert.assertTrue(("   and activityid=30015\n" +
                 "NNNNNN\n" +
-                "\n" +
                 "  select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
                 "  from hive.woe.l_activity_taskcomplete_log\n" +
-                "\t\n" +
                 "\t\t2.1\n" +
-                "\t\t\n" +
                 "\t\t\t2.1.2\n" +
-                "\t\t\n" +
                 "\t\t2.2\n" +
-                "\t\n" +
                 "  where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
                 ";").equals(rs));
     }
@@ -110,9 +103,16 @@ public class ExprTest extends BaseTest {
                         "   1.2\n" +
                         "$end;\n" +
                         "\tand activityid=30015 as e1;";
-        System.out.println(sql);
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
+        Assert.assertTrue(("SELECT concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                "FROM hive.woe.l_activity_taskcomplete_log WHERE concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                "\t1.0\n" +
+                "\t\t2.1\n" +
+                "\t\t\t2.1.4\n" +
+                "2.1.4.1 2.1.4.3 2.1.4.5 \t\t\t2.1.5\n" +
+                "\t\t2.2\n" +
+                "  \t1.1\n").equals(rs));
     }
 
     @Test
@@ -136,9 +136,14 @@ public class ExprTest extends BaseTest {
                         "\t\t$else\n" +
                         "\t\t\t2.1.4\n" +
                         "\t\t\t$if 1==1 $then 2.1.4.1 $else 2.1.4.2 $endif 2.1.4.3 $if 1>1 $then 2.1.4.4";
-        System.out.println(sql);
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
+        Assert.assertTrue(("SELECT concat(year,\"-\",month,\"-\",day) as ddate,count(1) num\n" +
+                "FROM hive.woe.l_activity_taskcomplete_log WHERE concat(year,month,day) between \"20190321\" and \"20191231\"\n" +
+                "\t1.0\n" +
+                "\t\t2.1\n" +
+                "\t\t\t2.1.4\n" +
+                "2.1.4.1 2.1.4.3 ").equals(rs));
     }
 
     @Test
@@ -159,5 +164,9 @@ public class ExprTest extends BaseTest {
         map.put("a", 0);
         String rs = exprService.eval(sql, map);
         System.out.println(rs);
+        Assert.assertTrue(("var b=0,a=0;\n" +
+                "\n" +
+                "SELECT uid, ltid, level from mysql.inf.if_user_basic_u WHERE uid = 12807099 as ceshi1;\n" +
+                "SELECT * FROM mysql.inf.conf_mf_source LIMIT 10 as e4;\n\n\n").equals(rs));
     }
 }

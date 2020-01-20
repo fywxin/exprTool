@@ -41,6 +41,6 @@ public class FuncExpr extends SectionExpr {
      * @return
      */
     public String getFuncParamStr(){
-        return text.substring(text.indexOf('(', startCol)+1, stopCol-1).trim();
+        return text.substring(text.indexOf('(', startCol)+1, stopCol).trim();
     }
 }

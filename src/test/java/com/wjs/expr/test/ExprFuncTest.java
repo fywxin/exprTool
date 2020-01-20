@@ -2,7 +2,6 @@ package com.wjs.expr.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nutz.dao.sql.Sql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class ExprFuncTest extends BaseTest {
     public void test1(){
         String sql="select 1 from \n" +
                 "$if a=1 $then\n" +
-                "1.1 $ifNull($str(),'Null'), $ifNull($str('val'),'Null')\n" +
+                " 1.1 $ifNull($str(),'Null'), $ifNull($str('val'),'Null')\n" +
                 "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $endif 1.1.3\n" +
                 "$elif a=2 $then\n" +
                 "1.2\n" +
@@ -36,10 +35,8 @@ public class ExprFuncTest extends BaseTest {
         String rs = this.exprService.eval(sql, map);
         System.out.println(rs);
         Assert.assertTrue(("select 1 from \n" +
-                "\n" +
-                "1.1 Null, Arg_val\n" +
-                "   1.1.0  1.1.1$colValue[cc_Arg_a_1]Arg_b_c1.1.2  1.1.3\n" +
-                "\n" +
+                " 1.1 Null, Arg_val\n" +
+                "   1.1.0 1.1.1$colValue[cc_Arg_a_1]Arg_b_c1.1.2 1.1.3\n" +
                 "test").equals(rs));
     }
 
@@ -83,6 +80,6 @@ public class ExprFuncTest extends BaseTest {
         String sql ="a $if $_isNull(a) $then null $else a $endif b $_isNull(a)";
         String rs = this.exprService.eval(sql, map);
         System.out.println(rs);
-        Assert.assertTrue("a  null  b true".equals(rs));
+        Assert.assertTrue("a null b true".equals(rs));
     }
 }

@@ -22,7 +22,6 @@ public class StrFunc extends AbstractExprFunc {
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
         AviatorString str = (AviatorString)arg1;
         String col = str.getLexeme();
-        System.out.println(getName()+"('"+col+"') = Arg_"+ col);
         return new AviatorString("Arg_"+col);
     }
 
@@ -34,7 +33,6 @@ public class StrFunc extends AbstractExprFunc {
         AviatorString str2 = (AviatorString)arg2;
         String col2 = str2.getLexeme();
 
-        System.out.println(getName()+"('"+col1+"', '"+col2+"') = Arg_"+ col1+"_"+col2);
         return new AviatorString("Arg_"+ col1+"_"+col2);
     }
 

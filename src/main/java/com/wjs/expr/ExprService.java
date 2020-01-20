@@ -57,8 +57,7 @@ public class ExprService {
         ExprTree subExprTree = null;
         exprTree.start();
         while ((baseExpr = exprTree.walk()) != null){
-            System.out.println("1.[" +start+ "- "+baseExpr.startCol+" - "+exprTree.text.substring(start, baseExpr.startCol)+"]");
-            evalSection(exprTree, sb, start, baseExpr.startCol);
+            evalSection(exprTree, sb, start, this.skipGrammarLineBeforeIndex(exprTree.text, baseExpr.startCol-1));
             if (baseExpr instanceof ForExpr){
                 ForExpr forExpr = (ForExpr) baseExpr;
                 subExprTree = exprTree.getSubExprTree(forExpr, forExpr.bodyStartCol, forExpr.bodyStopCol);
@@ -92,13 +91,19 @@ public class ExprService {
                 }
             }
 
-            start = baseExpr.stopCol+1;
+            //start = baseExpr.stopCol+1;
+//            if (!exprTree.hasNext()) {
+//                start = baseExpr.stopCol+1;
+//            }else{
+                start = skipGrammarLineAfterIndex(exprTree.getText(), baseExpr.stopCol + 1, stop);
+//            }
         }
-        if (start < stop){
-            System.out.println("2.[" +start+ "- "+(stop+1)+" - "+exprTree.text.substring(start, stop+1)+"]");
-            evalSection(exprTree, sb, start, stop+1);
+        if (start <= stop){
+            evalSection(exprTree, sb, start, stop);
         }
     }
+
+
 
     /**
      * for表达式支持
@@ -109,6 +114,8 @@ public class ExprService {
     public void evalFor(ExprTree subExprTree, StringBuilder sb, ForExpr forExpr) {
         Map<String, Object> params = subExprTree.getParams();
         ExprEval exprEval = this.exprEvalService.exprEval;
+        int start = skipGrammarLineAfterIndex(subExprTree.getText(), forExpr.bodyStartCol, forExpr.bodyStopCol);
+        int stop = this.skipGrammarLineBeforeIndex(subExprTree.getText(), forExpr.bodyStopCol);
         if (forExpr.getForEnum() == ForExpr.ForEnum.TERNARY_MODE){
             String key = forExpr.getTernaryVar().getFirst();
             Object oldVal = params.get(key);
@@ -120,7 +127,7 @@ public class ExprService {
                     params.put(key, forExpr.getTernaryVar().getSecond());
                 }
                 while (exprEval.eval(forExpr.getTernaryPredicate(), params)) {
-                    sb.append(eval(subExprTree, forExpr.bodyStartCol, forExpr.bodyStopCol));
+                    sb.append(eval(subExprTree, start, stop));
                     params.put(key, exprEval.call(forExpr.getTernaryOpt(), params));
                     loop ++;
                     if (loop > MAX_LOOP){
@@ -152,7 +159,7 @@ public class ExprService {
                         params.put(key_index, i);
                         params.put(key_FIRST, i == 0);
                         params.put(key_LAST, i == cc.size()-1);
-                        sb.append(eval(subExprTree, forExpr.bodyStartCol, forExpr.bodyStopCol));
+                        sb.append(eval(subExprTree, start, stop));
                         IForInListener.callIn(forInListenerList, subExprTree, forExpr, key, obj, i);
                         i++;
                     }
@@ -163,7 +170,7 @@ public class ExprService {
                         params.put(key_index, i);
                         params.put(key_FIRST, i == 0);
                         params.put(key_LAST, i == map.size()-1);
-                        sb.append(eval(subExprTree, forExpr.bodyStartCol, forExpr.bodyStopCol));
+                        sb.append(eval(subExprTree, start, stop));
                         IForInListener.callIn(forInListenerList, subExprTree, forExpr, key, entry, i);
                         i++;
                     }
@@ -179,10 +186,13 @@ public class ExprService {
     }
 
     private void out(BodyExpr bodyExpr, ExprTree exprTree, StringBuilder sb){
+        //处理多余表达式换行
+        int start = skipGrammarLineAfterIndex(exprTree.text, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+        int stop = skipGrammarLineBeforeIndex(exprTree.text, bodyExpr.bodyStopCol);
         if (exprTree.getTopExprList().isEmpty()){
-            evalSection(exprTree, sb, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+            evalSection(exprTree, sb, start, stop);
         }else{
-            evalExpr(exprTree, sb, bodyExpr.bodyStartCol, bodyExpr.bodyStopCol);
+            evalExpr(exprTree, sb, start, stop);
         }
     }
 
@@ -197,8 +207,7 @@ public class ExprService {
         String text = exprTree.text;
         List<SectionExpr> innerSectionExprList = exprTree.innerSectionAndFunc(startCol, stopCol);
         if (innerSectionExprList.isEmpty()){
-            System.out.println("3.[" +startCol+ " - "+stopCol+" - "+exprTree.text.substring(startCol, stopCol)+"]");
-            sb.append(text, startCol, stopCol);
+            sb.append(text, startCol, stopCol+1);
             return ;
         }
         int start = startCol;
@@ -207,8 +216,8 @@ public class ExprService {
             sb.append(this.exprEvalService.eval(sectionExpr, exprTree.getParams()));
             start = sectionExpr.stopCol + 1;
         }
-        if (start < stopCol){
-            sb.append(text, start, stopCol);
+        if (start <= stopCol){
+            sb.append(text, start, stopCol+1);
         }
     }
 
@@ -224,6 +233,47 @@ public class ExprService {
             log.error("表达式计算异常: ["+exprExpr.getExprText()+"].("+params+")", e);
             throw new ExprException(e);
         }
+    }
+
+    /**
+     * 跳过语法换行位置适配
+     *  1. bodyStartCol 往后跳
+     *  2. endif endfor 往后跳
+     *
+     * @param text
+     * @param startCol  原始开始位置
+     * @param stopCol 边界
+     * @return
+     */
+    private Integer skipGrammarLineAfterIndex(String text, int startCol, int stopCol){
+        int start = startCol;
+        while (start <= stopCol && (text.charAt(start) == ' ' || text.charAt(start) == '\t')){
+            start++;
+        }
+//        if (start < stopCol && text.charAt(start) == '\n'){
+//            return start+1;
+//        }
+//        return startCol;
+
+        //TODO 空格也删除
+        if (start <= stopCol && text.charAt(start) == '\n'){
+            start++;
+        }
+        return start;
+    }
+
+    private Integer skipGrammarLineBeforeIndex(String text, int stopCol){
+        if (stopCol >= text.length()){
+            return stopCol;
+        }
+        int pre = stopCol;
+        while (pre>0 && (text.charAt(pre) == ' ' || text.charAt(pre) == '\t')){
+            pre--;
+        }
+        if (pre>=0 && text.charAt(pre) == '\n'){
+            return pre;
+        }
+        return stopCol;
     }
 
     //---------------------------------------------------------------

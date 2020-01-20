@@ -132,11 +132,9 @@ public class ExprSectionTest extends BaseTest {
         String rs = this.exprService.eval(sql, map);
         System.out.println(rs);
         Assert.assertTrue(("select 1 from \n" +
-                "\n" +
                 "1.1 Null, Arg_val\n" +
-                "   1.1.0  1.1.3\n" +
+                "   1.1.0 1.1.3\n" +
                 "   section1 Arg_1.1.4\n" +
-                "\n" +
                 "test").equals(rs));
     }
 

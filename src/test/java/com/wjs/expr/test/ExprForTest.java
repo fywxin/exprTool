@@ -17,17 +17,20 @@ public class ExprForTest extends BaseTest {
         Map<String, Object> params = new HashMap<>();
         params.put("woe", true);
 
-        String sql = "dd\n" +
-                "$for(i=0;i<2;i++)\n" +
-                "xx\n" +
+        String sql = "d\n" +
+                "$for (i=0;i<2;i++)\n" +
+                "x\n" +
                 "$endfor\n" +
-                "ee";
+                "e";
+
+        System.out.println(sql+"\n");
+
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
-        Assert.assertTrue(("dd\n" +
-                "xx\n" +
-                "xx\n" +
-                "ee").equals(rs));
+        Assert.assertTrue(("d\n" +
+                "x\n" +
+                "x\n" +
+                "e").equals(rs));
     }
 
     @Test
@@ -46,17 +49,15 @@ public class ExprForTest extends BaseTest {
                 "sd\n" +
                 "$endif\n" +
                 "3";
+
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
         Assert.assertTrue(("1\n" +
                 "xx\n" +
                 "xx\n" +
                 "xx\n" +
-                "\n" +
                 "2\n" +
-                "\n" +
                 "woe\n" +
-                "\n" +
                 "3").equals(rs));
     }
 
@@ -84,20 +85,13 @@ public class ExprForTest extends BaseTest {
         System.out.println(rs);
         Assert.assertTrue(("1\n" +
                 "   1.1\n" +
-                "   \n" +
                 "       1.1.0\n" +
-                "   \n" +
                 "   xx\n" +
                 "   1.1\n" +
-                "   \n" +
                 "       1.1.1\n" +
-                "   \n" +
                 "   xx\n" +
-                "\n" +
                 "2\n" +
-                "\n" +
                 "   woe\n" +
-                "\n" +
                 "3").equals(rs));
     }
 
@@ -116,7 +110,7 @@ public class ExprForTest extends BaseTest {
                 "       $else\n" +
                 "           1.1.i.2\n" +
                 "       $endif\n" +
-                "       1.2.i" +
+                "       1.2.i\n" +
                 "   $endif\n" +
                 "   xx\n" +
                 "$endfor\n" +
@@ -131,18 +125,12 @@ public class ExprForTest extends BaseTest {
         System.out.println(rs);
         Assert.assertTrue(("1\n" +
                 "   1.1\n" +
-                "   \n" +
                 "       1.1.i\n" +
-                "       \n" +
                 "           1.1.i.2\n" +
-                "       \n" +
-                "       1.2.i   \n" +
+                "       1.2.i\n" +
                 "   xx\n" +
-                "\n" +
                 "2\n" +
-                "\n" +
                 "   woe\n" +
-                "\n" +
                 "3").equals(rs));
     }
 
@@ -161,11 +149,11 @@ public class ExprForTest extends BaseTest {
                 "       $else\n" +
                 "           1.1.<$i$>.2\n" +
                 "       $endif\n" +
-                "       1.2.<$i$>" +
+                "       1.2.<$i$>\n" +
                 "   $endif\n" +
                 "   xx\n" +
                 "$endfor\n" +
-                "2\n" +
+                "2\n\n" +
                 "$if woe $then\n" +
                 "   woe1\n" +
                 "   $for(i=0; i<3; i++)\n" +
@@ -184,31 +172,22 @@ public class ExprForTest extends BaseTest {
         System.out.println(rs);
         Assert.assertTrue(("1\n" +
                 "   1.1\n" +
-                "   \n" +
                 "       1.1.0\n" +
-                "       \n" +
                 "           1.1.0.2\n" +
-                "       \n" +
-                "       1.2.0   \n" +
+                "       1.2.0\n" +
                 "   xx\n" +
                 "   1.1\n" +
-                "   \n" +
                 "       1.1.1\n" +
-                "       \n" +
                 "           1.1.1.1\n" +
-                "       \n" +
-                "       1.2.1   \n" +
+                "       1.2.1\n" +
                 "   xx\n" +
-                "\n" +
                 "2\n" +
                 "\n" +
                 "   woe1\n" +
-                "          woe2\n" +
-                "          woe2\n" +
-                "          woe2\n" +
-                "   \n" +
+                "       woe2\n" +
+                "       woe2\n" +
+                "       woe2\n" +
                 "   woe3\n" +
-                "\n" +
                 "3").equals(rs));
     }
 
@@ -228,7 +207,6 @@ public class ExprForTest extends BaseTest {
                 "a\n" +
                 "b\n" +
                 "c\n" +
-                "\n" +
                 "ee").equals(rs));
     }
 
@@ -252,7 +230,6 @@ public class ExprForTest extends BaseTest {
                 "false\n" +
                 "false\n" +
                 "false\n" +
-                "\n" +
                 "ee").equals(rs));
     }
 
@@ -274,7 +251,6 @@ public class ExprForTest extends BaseTest {
         Assert.assertTrue(("dd\n" +
                 "a - A - 0 - true - false\n" +
                 "b - B - 1 - false - true\n" +
-                "\n" +
                 "ee").equals(rs));
     }
 
@@ -283,9 +259,9 @@ public class ExprForTest extends BaseTest {
         Map<String, Object> params = new HashMap<>();
         params.put("woe", true);
 
-        String sql = "dd\n" +
+        String sql = "d\n" +
                 "$for(i=0;i<2;i++)\n" +
-                "   1" +
+                "   1\n" +
                 "   $if(i==0) $then\n" +
                 "       $for(j=0;j<3;j++)\n" +
                 "           x<$i$>_<$j$>\n" +
@@ -293,21 +269,19 @@ public class ExprForTest extends BaseTest {
                 "   $endif\n" +
                 "   2\n" +
                 "$endfor\n" +
-                "ee";
+                "e";
+        System.out.println(sql+"\n\n");
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
-        Assert.assertTrue(("dd\n" +
-                "   1   \n" +
-                "                  x0_0\n" +
-                "                  x0_1\n" +
-                "                  x0_2\n" +
-                "       \n" +
-                "   \n" +
+        Assert.assertTrue(("d\n" +
+                "   1\n" +
+                "           x0_0\n" +
+                "           x0_1\n" +
+                "           x0_2\n" +
                 "   2\n" +
-                "   1   \n" +
+                "   1\n" +
                 "   2\n" +
-                "\n" +
-                "ee").equals(rs));
+                "e").equals(rs));
     }
 
     @Test
@@ -325,14 +299,11 @@ public class ExprForTest extends BaseTest {
         String rs = exprService.eval(sql, params);
         System.out.println(rs);
         Assert.assertTrue(("dd\n" +
-                "          x0_0\n" +
-                "          x0_1\n" +
-                "          x0_2\n" +
-                "   \n" +
-                "          x1_1\n" +
-                "          x1_2\n" +
-                "   \n" +
-                "\n" +
+                "       x0_0\n" +
+                "       x0_1\n" +
+                "       x0_2\n" +
+                "       x1_1\n" +
+                "       x1_2\n" +
                 "ee").equals(rs));
     }
 }
