@@ -33,7 +33,7 @@ public class SectionExpr extends BaseExpr {
     }
 
     public String getSectionText(){
-        StringBuilder sb = new StringBuilder(stopCol-startCol-4);
+        StringBuilder sb = new StringBuilder(stopCol-startCol-3);
         Character c = null;
         for (int i=startCol+2; i<stopCol-1; i++){
             c = text.charAt(i);

@@ -63,7 +63,7 @@ public class ExprSectionTest extends BaseTest {
 
     @Test
     public void testFuncAndSection2() {
-        String sql = "aa <$ $str('1')+1 $>ff";
+        String sql = "aa <$$str('1')+1$>ff";
         Map<String, Object> map = new HashMap<>();
         map.put("a", 1);
         String rs = this.exprService.eval(sql, map);

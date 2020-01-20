@@ -25,7 +25,7 @@ public class FuncExpr extends SectionExpr {
 
     @Override
     public String getSectionText(){
-        return text.substring(startCol, stopCol);
+        return text.substring(startCol, stopCol+1);
     }
 
     /**

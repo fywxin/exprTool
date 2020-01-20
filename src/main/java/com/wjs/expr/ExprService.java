@@ -57,10 +57,10 @@ public class ExprService {
         ExprTree subExprTree = null;
         exprTree.start();
         while ((baseExpr = exprTree.walk()) != null){
+            System.out.println("1.[" +start+ "- "+baseExpr.startCol+" - "+exprTree.text.substring(start, baseExpr.startCol)+"]");
             evalSection(exprTree, sb, start, baseExpr.startCol);
             if (baseExpr instanceof ForExpr){
                 ForExpr forExpr = (ForExpr) baseExpr;
-
                 subExprTree = exprTree.getSubExprTree(forExpr, forExpr.bodyStartCol, forExpr.bodyStopCol);
                 this.evalFor(subExprTree, sb, forExpr);
             }else{
@@ -95,6 +95,7 @@ public class ExprService {
             start = baseExpr.stopCol+1;
         }
         if (start < stop){
+            System.out.println("2.[" +start+ "- "+(stop+1)+" - "+exprTree.text.substring(start, stop+1)+"]");
             evalSection(exprTree, sb, start, stop+1);
         }
     }
@@ -196,6 +197,7 @@ public class ExprService {
         String text = exprTree.text;
         List<SectionExpr> innerSectionExprList = exprTree.innerSectionAndFunc(startCol, stopCol);
         if (innerSectionExprList.isEmpty()){
+            System.out.println("3.[" +startCol+ " - "+stopCol+" - "+exprTree.text.substring(startCol, stopCol)+"]");
             sb.append(text, startCol, stopCol);
             return ;
         }
