@@ -121,9 +121,9 @@ public class ExprSectionTest extends BaseTest {
                 "1.1 $ifNull($str(),'Null'), $ifNull($str('val'),'Null')\n" +
                 "   1.1.0 $if b=1 $then 1.1.1$colValue(cc,$str('a'),1)$str('b', 'c')1.1.2 $endif 1.1.3\n" +
                 "   <$ 'section'+a$> $str('1.1.4')\n"+
-                "$elif a=2 $then\n" +
+                "$elseif a=2 $then\n" +
                 "1.2\n" +
-                "$elif a=3 $then\n" +
+                "$elseif a=3 $then\n" +
                 "1.3\n" +
                 "$else\n" +
                 "1.4 <$ 'section'+a$> $str('1.4.1')\n" +

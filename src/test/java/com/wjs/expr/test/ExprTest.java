@@ -23,7 +23,7 @@ public class ExprTest extends BaseTest {
                 "\t\t2.1\n" +
                 "\t\t$if 2<1 $then\n" +
                 "\t\t\t2.1.1\n" +
-                "\t\t$elif 2==2 $then\n" +
+                "\t\t$elseif 2==2 $then\n" +
                 "\t\t\t2.1.2\n" +
                 "\t\t$else\n" +
                 "\t\t\t2.1.3\n" +
@@ -44,7 +44,7 @@ public class ExprTest extends BaseTest {
                 "\t\t2.1\n" +
                 "\t\t$if 2<1 $then\n" +
                 "\t\t\t2.1.1\n" +
-                "\t\t$elif 2==2 $then\n" +
+                "\t\t$elseif 2==2 $then\n" +
                 "\t\t\t2.1.2\n" +
                 "\t\t$else\n" +
                 "\t\t\t2.1.3\n" +
@@ -85,9 +85,9 @@ public class ExprTest extends BaseTest {
                         "\t\t2.1\n" +
                         "\t\t$if 2<1 $then\n" +
                         "\t\t\t2.1.1\n" +
-                        "\t\t$elif 2!=2 $then\n" +
+                        "\t\t$elseif 2!=2 $then\n" +
                         "\t\t\t2.1.2\n" +
-                        "\t\t$elif 2>2 $then\n" +
+                        "\t\t$elseif 2>2 $then\n" +
                         "\t\t\t2.1.3\n" +
                         "\t\t$else\n" +
                         "\t\t\t2.1.4\n" +
@@ -129,9 +129,9 @@ public class ExprTest extends BaseTest {
                         "\t\t2.1\n" +
                         "\t\t$IF 2<1 $then\n" +
                         "\t\t\t2.1.1\n" +
-                        "\t\t$elif 2!=2 $then\n" +
+                        "\t\t$elseif 2!=2 $then\n" +
                         "\t\t\t2.1.2\n" +
-                        "\t\t$elif 2>2 $then\n" +
+                        "\t\t$elseif 2>2 $then\n" +
                         "\t\t\t2.1.3\n" +
                         "\t\t$else\n" +
                         "\t\t\t2.1.4\n" +
@@ -151,7 +151,7 @@ public class ExprTest extends BaseTest {
         String sql ="var b=0,a=0;\n" +
                 "\n" +
                 "$if b=0 $then\n" +
-                "SELECT uid, $if b=0 $then ltid, $elif b>=2 $then citylvl, $else kid, $endif level from mysql.inf.if_user_basic_u WHERE uid = 12807099 as ceshi1;\n" +
+                "SELECT uid, $if b=0 $then ltid, $elseif b>=2 $then citylvl, $else kid, $endif level from mysql.inf.if_user_basic_u WHERE uid = 12807099 as ceshi1;\n" +
                 "SELECT * FROM mysql.inf.conf_mf_source LIMIT 10 as e4;\n" +
                 "$endif\n" +
                 "\n" +
