@@ -70,12 +70,16 @@ public class BaseExpr implements Comparable<BaseExpr> {
         return this.startCol <= other.startCol && this.stopCol >= other.stopCol;
     }
 
-    public boolean in(int startCol, int stopCol){
-        return this.startCol >= startCol && this.stopCol <= stopCol;
+    public boolean contain(int startCol, int stopCol){
+        return this.startCol <= startCol && this.stopCol >= stopCol;
     }
 
     public boolean in(BaseExpr other){
         return this.startCol >= other.startCol && this.stopCol <= other.stopCol;
+    }
+
+    public boolean in(int startCol, int stopCol){
+        return this.startCol >= startCol && this.stopCol <= stopCol;
     }
 
     @Override

@@ -166,4 +166,12 @@ public class ExprTree {
         walkIndex = 0;
         params = null;
     }
+
+    /**
+     * 是否只是原始字符
+     * @return
+     */
+    public boolean isRaw(){
+        return this.binaryExprList.isEmpty() && this.forExprList.isEmpty() && this.funcExprList.isEmpty() && this.sectionExprList.isEmpty();
+    }
 }
