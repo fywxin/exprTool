@@ -35,7 +35,9 @@ public class ExprTree {
 
     public Integer stopCol;
 
-    public BaseExpr parent;
+    public BaseExpr belong;
+
+    public ExprTree parent;
 
     //----------------树节点循环信息-----------------
     private List<BaseExpr> topExprList;
@@ -45,7 +47,7 @@ public class ExprTree {
     public Map<String, Object> params;
 
 
-    public ExprTree(String text, List<BinaryExpr> binaryExprList, List<FuncExpr> funcExprList, List<SectionExpr> sectionExprList, List<ForExpr> forExprList, Integer startCol, Integer stopCol, BaseExpr parent) {
+    public ExprTree(String text, List<BinaryExpr> binaryExprList, List<FuncExpr> funcExprList, List<SectionExpr> sectionExprList, List<ForExpr> forExprList, Integer startCol, Integer stopCol, BaseExpr belong) {
         this.text = text;
         this.binaryExprList = binaryExprList;
         this.funcExprList = funcExprList;
@@ -53,7 +55,7 @@ public class ExprTree {
         this.forExprList = forExprList;
         this.startCol = startCol;
         this.stopCol = stopCol;
-        this.parent = parent;
+        this.belong = belong;
     }
 
     /**
@@ -72,8 +74,9 @@ public class ExprTree {
         subExprTree.setForExprList(this.forExprList.stream().filter(x -> x.in(startCol, stopCol)).collect(Collectors.toList()));
         subExprTree.setStartCol(startCol);
         subExprTree.setStopCol(stopCol);
-        subExprTree.setParent(baseExpr);
+        subExprTree.setBelong(baseExpr);
         subExprTree.setParams(this.params);
+        subExprTree.setParent(this);
         return subExprTree;
     }
 

@@ -21,7 +21,7 @@ public class GrammarTest extends BaseTest {
                 "as e1;\n" +
                 "$if ads=sdf $then\n" +
                 "   select concat(year,\"-\",month,\"-\",day) as ddate,count(1) num  $if 1=1 $then dsdds $else sayhello $endif\n" +
-                "$elif ds=dffff adn $then;\n" +
+                "$elseif ds=dffff adn $then;\n" +
                 "   from hive.woe.l_activity_taskcomplete_log\n" +
                 "$else\n" +
                 "   where concat(year,month,day) between \"20190321\" and \"20191231\"\n" +

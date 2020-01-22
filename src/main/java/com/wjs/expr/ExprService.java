@@ -41,7 +41,7 @@ public class ExprService {
 
     public String eval(ExprTree exprTree, Map<String, Object> params){
         exprTree.attachParams(params);
-        return eval(exprTree, 0, exprTree.text.length()-1);
+        return eval(exprTree, exprTree.startCol, exprTree.stopCol-1);
     }
 
     public String eval(ExprTree exprTree, int startCol, int stopCol){
