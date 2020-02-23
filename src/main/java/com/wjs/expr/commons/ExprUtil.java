@@ -1,5 +1,11 @@
 package com.wjs.expr.commons;
 
+import com.wjs.expr.ExprManager;
+import com.wjs.expr.exprNative.CharSpitService;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author wjs
  * @date 2020-01-16 14:34
@@ -85,10 +91,110 @@ public class ExprUtil {
         return !isBlank(str);
     }
 
+    /**
+     * 获取前N个单词
+     * @param sql
+     * @param n
+     * @return
+     */
+    public static List<Tuple2<String, Integer>> headWordN(String sql, int n){
+        return headWordN(sql, n, ExprManager.ExprServiceHolder.getInstance().sqlExprNativeService);
+    }
+
+    /**
+     *  获取前N个单词
+     * @param sql
+     * @param n
+     * @param charSpitService 单词识别
+     * @return
+     */
+    public static List<Tuple2<String, Integer>> headWordN(String sql, int n, CharSpitService charSpitService){
+        Character c = null;
+        List<Tuple2<String, Integer>> words = new ArrayList<>(n);
+        int wc = -1;
+        for (int i=0; i<sql.length(); i++){
+            c = sql.charAt(i);
+            if (wc == -1){
+                if (charSpitService.isSplitChar(c)){
+                    continue;
+                }else{
+                    wc = i;
+                }
+            }else{
+                if (charSpitService.isSplitChar(c)){
+                    words.add(new Tuple2<>(sql.substring(wc, i), wc));
+                    if (words.size() >= n){
+                        return words;
+                    }
+                    wc = -1;
+                }else{
+                    continue;
+                }
+            }
+        }
+        if (wc != -1){
+            words.add(new Tuple2<>(sql.substring(wc), wc));
+        }
+        return words;
+    }
+
+    /**
+     * 获取尾巴N个单词 - 反序
+     * @param sql
+     * @param n
+     * @return
+     */
+    public static List<Tuple2<String, Integer>> tailWordN(String sql, int n){
+        return tailWordN(sql, n, ExprManager.ExprServiceHolder.getInstance().sqlExprNativeService);
+    }
+
+    /**
+     *
+     * @param sql
+     * @param n
+     * @param charSpitService
+     * @return
+     */
+    public static List<Tuple2<String, Integer>> tailWordN(String sql, int n, CharSpitService charSpitService){
+        Character c = null;
+        List<Tuple2<String, Integer>> words = new ArrayList<>(n);
+        int wc = -1;
+        int len = sql.length();
+        for (int i=len-1; i>=0; i--){
+            c = sql.charAt(i);
+            if (wc == -1){
+                if (charSpitService.isSplitChar(c)){
+                    continue;
+                }else{
+                    wc = i;
+                }
+            }else{
+                if (charSpitService.isSplitChar(c)){
+                    words.add(new Tuple2<>(sql.substring(i+1, wc+1), i+1));
+                    if (words.size() >= n){
+                        return words;
+                    }
+                    wc = -1;
+                }else{
+                    continue;
+                }
+            }
+        }
+        if (wc != -1){
+            words.add(new Tuple2<>(sql.substring(0, wc+1), 0));
+        }
+        return words;
+    }
+
     public static void main(String[] args) {
         String str=Integer.MAX_VALUE+"";
         int chr = str.length();
         System.out.println(chr);
         System.out.println(isNumeric("122122"));
+        String a = "select uid,xql_flat(dict,backpack,'itemid|iteminfo') from e_1\n" +
+                "WHERE id=1 \tand tt=1 as t_1";
+
+        System.out.println(headWordN(a, 200));
+        System.out.println(tailWordN(a, 200));
     }
 }
