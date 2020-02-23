@@ -34,6 +34,17 @@ public class ExprForTest extends BaseTest {
     }
 
     @Test
+    public void testFor(){
+        Map<String, Object> params = new HashMap<>();
+        params.put("k", 5);
+        String sql = "$for(i=1; i<k;i++)\n" +
+                "SELECT * FROM mysql.inf.if_user_basic LIMIT <$i$> as e<$i$>;\n" +
+                "$endfor";
+        String rs = exprService.eval(sql, params);
+        System.out.println(rs);
+    }
+
+    @Test
     public void test2(){
         Map<String, Object> params = new HashMap<>();
         params.put("woe", true);

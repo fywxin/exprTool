@@ -1,7 +1,7 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
-import com.wjs.expr.exprNative.ExprNativeService;
+import com.wjs.expr.exprNative.CharSpitService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Optional;
  **/
 public class ExprGrammarService {
 
-    public ExprNativeService exprNativeService;
+    public CharSpitService charSpitService;
 
     /**
      * 语法解析提取
@@ -336,7 +336,7 @@ public class ExprGrammarService {
      * @return
      */
     public boolean isSplitChar(Character c){
-        return exprNativeService.isSplitChar(c);
+        return charSpitService.isSplitChar(c);
     }
 
 }
