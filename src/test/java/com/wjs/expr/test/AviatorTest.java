@@ -6,8 +6,6 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.wjs.expr.ExprException;
 import com.wjs.expr.exprNative.SqlExprNativeService;
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.Assert;
 import org.junit.Test;
 

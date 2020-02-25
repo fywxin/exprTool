@@ -1,7 +1,7 @@
 package com.wjs.expr.commons;
 
 import com.wjs.expr.ExprManager;
-import com.wjs.expr.exprNative.CharSpitService;
+import com.wjs.expr.exprNative.CharSpitPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,23 +105,23 @@ public class ExprUtil {
      *  获取前N个单词
      * @param sql
      * @param n
-     * @param charSpitService 单词识别
+     * @param charSpitPredicate 单词识别
      * @return
      */
-    public static List<Tuple2<String, Integer>> headWordN(String sql, int n, CharSpitService charSpitService){
+    public static List<Tuple2<String, Integer>> headWordN(String sql, int n, CharSpitPredicate charSpitPredicate){
         Character c = null;
         List<Tuple2<String, Integer>> words = new ArrayList<>(n);
         int wc = -1;
         for (int i=0; i<sql.length(); i++){
             c = sql.charAt(i);
             if (wc == -1){
-                if (charSpitService.isSplitChar(c)){
+                if (charSpitPredicate.isSplitChar(c)){
                     continue;
                 }else{
                     wc = i;
                 }
             }else{
-                if (charSpitService.isSplitChar(c)){
+                if (charSpitPredicate.isSplitChar(c)){
                     words.add(new Tuple2<>(sql.substring(wc, i), wc));
                     if (words.size() >= n){
                         return words;
@@ -152,10 +152,10 @@ public class ExprUtil {
      *
      * @param sql
      * @param n
-     * @param charSpitService
+     * @param charSpitPredicate
      * @return
      */
-    public static List<Tuple2<String, Integer>> tailWordN(String sql, int n, CharSpitService charSpitService){
+    public static List<Tuple2<String, Integer>> tailWordN(String sql, int n, CharSpitPredicate charSpitPredicate){
         Character c = null;
         List<Tuple2<String, Integer>> words = new ArrayList<>(n);
         int wc = -1;
@@ -163,13 +163,13 @@ public class ExprUtil {
         for (int i=len-1; i>=0; i--){
             c = sql.charAt(i);
             if (wc == -1){
-                if (charSpitService.isSplitChar(c)){
+                if (charSpitPredicate.isSplitChar(c)){
                     continue;
                 }else{
                     wc = i;
                 }
             }else{
-                if (charSpitService.isSplitChar(c)){
+                if (charSpitPredicate.isSplitChar(c)){
                     words.add(new Tuple2<>(sql.substring(i+1, wc+1), i+1));
                     if (words.size() >= n){
                         return words;
@@ -194,7 +194,7 @@ public class ExprUtil {
         String a = "select uid,xql_flat(dict,backpack,'itemid|iteminfo') from e_1\n" +
                 "WHERE id=1 \tand tt=1 as t_1";
 
-        System.out.println(headWordN(a, 200));
+        System.out.println(headWordN(a, 200, c -> c == ' '));
         System.out.println(tailWordN(a, 200));
     }
 }

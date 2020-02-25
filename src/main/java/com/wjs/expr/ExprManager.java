@@ -23,7 +23,7 @@ public class ExprManager extends ExprService {
         sqlExprNativeService = new SqlExprNativeService();
 
         exprGrammarService = new ExprGrammarService();
-        exprGrammarService.charSpitService = sqlExprNativeService;
+        exprGrammarService.charSpitPredicate = sqlExprNativeService;
 
         exprEvalService = new ExprEvalService();
         exprEvalService.exprEval = aviatorEval;
