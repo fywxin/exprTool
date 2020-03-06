@@ -221,7 +221,11 @@ public class ExprService {
         String text = exprTree.text;
         List<SectionExpr> innerSectionExprList = exprTree.innerSectionAndFunc(startCol, stopCol);
         if (innerSectionExprList.isEmpty()){
-            sb.append(text, startCol, stopCol+1);
+            if (stopCol == text.length()){
+                sb.append(text, startCol, stopCol);
+            }else{
+                sb.append(text, startCol, stopCol+1);
+            }
             return ;
         }
         int start = startCol;
@@ -231,7 +235,11 @@ public class ExprService {
             start = sectionExpr.stopCol + 1;
         }
         if (start <= stopCol){
-            sb.append(text, start, stopCol+1);
+            if (stopCol == text.length()){
+                sb.append(text, startCol, stopCol);
+            }else{
+                sb.append(text, startCol, stopCol+1);
+            }
         }
     }
 
