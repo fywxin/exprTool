@@ -236,9 +236,9 @@ public class ExprService {
         }
         if (start <= stopCol){
             if (stopCol == text.length()){
-                sb.append(text, startCol, stopCol);
+                sb.append(text, start, stopCol);
             }else{
-                sb.append(text, startCol, stopCol+1);
+                sb.append(text, start, stopCol+1);
             }
         }
     }
