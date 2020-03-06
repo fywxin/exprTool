@@ -39,14 +39,14 @@ public class ExprEvalService {
                 if (exprFunction != null && exprFunction instanceof ExprInnerFunction){
                     String paramText = exprText.substring(start+1, end).trim();
                     rs = (Boolean) this.evalInnerFunc((ExprInnerFunction)exprFunction, params, paramText, Boolean.class);
-                    log.info("Inner func: {}({}) = {}", funcName, paramText, rs);
+                    log.debug("Inner func: {}({}) = {}", funcName, paramText, rs);
                     return rs;
                 }
             }
         }
         String expr = exprNativeService.exprNative(exprExpr.getExprText());
         rs = exprEval.eval(expr, params);
-        log.info("Expr {}({}) = {}", expr, params, rs);
+        log.debug("Expr {}({}) = {}", expr, params, rs);
         return rs;
     }
 
