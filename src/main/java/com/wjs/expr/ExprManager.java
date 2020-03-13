@@ -41,6 +41,10 @@ public class ExprManager extends ExprService {
         return this;
     }
 
+    public static ExprManager getInstance(){
+        return ExprServiceHolder.getInstance();
+    }
+
     public static class ExprServiceHolder{
         private static ExprManager INSTANCE = new ExprManager();
 
