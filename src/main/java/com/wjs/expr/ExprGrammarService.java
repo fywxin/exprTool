@@ -32,7 +32,7 @@ public class ExprGrammarService {
         String frame = null;
         String cmd = null;
 
-        List<BinaryExpr> list= new ArrayList<>();
+        List<BinaryExpr> binaryExprList= new ArrayList<>();
         List<FuncExpr> funcExprList = new ArrayList<>();
         List<SectionExpr> sectionExprList = new ArrayList<>();
         List<ForExpr> forExprList = new ArrayList<>();
@@ -161,7 +161,7 @@ public class ExprGrammarService {
                             binaryExpr.setParentFor(forStack.get(forStack.size()-1));
                         }
 
-                        list.add(binaryExpr);
+                        binaryExprList.add(binaryExpr);
                         break;
                     case BaseExpr.FOR:
                         int start = i;
@@ -257,7 +257,7 @@ public class ExprGrammarService {
                     binaryExpr.lastElifExpr().autoComplete = true;
                 }
                 binaryExpr.autoComplete = true;
-                list.add(binaryExpr);
+                binaryExprList.add(binaryExpr);
             }
         }else {
             if (!ifStack.isEmpty()) {
@@ -265,7 +265,7 @@ public class ExprGrammarService {
             }
         }
 
-        return new ExprTree(text, list, funcExprList, sectionExprList, forExprList, 0, text.length(), null);
+        return new ExprTree(text, binaryExprList, funcExprList, sectionExprList, forExprList, 0, text.length(), null);
     }
 
     private void checkIf(List<BinaryExpr> ifStack, Line line){
@@ -279,6 +279,9 @@ public class ExprGrammarService {
         if (ifExpr.getBodyStartCol() == null){
             throw new ExprException(line.info()+BaseExpr._IF+" 缺失 "+BaseExpr._THEN+" 关键字");
         }
+        if (ifExpr.getStopLine() != null){
+            throw new ExprException(line.info()+BaseExpr._IF+" 表达式["+(ifExpr.getStopLine().lineNum+1)+" - "+(line.lineNum+1)+"]匹配错误");
+        }
         ifExpr.setStopLine(line);
         ifExpr.setBodyStopCol(i-1);
         ifExpr.setStopCol(i-1);
@@ -289,6 +292,9 @@ public class ExprGrammarService {
         if (elifExpr.getBodyStartCol() == null){
             throw new ExprException(line.info()+BaseExpr._ELIF+" 缺失 "+BaseExpr._THEN+" 关键字");
         }
+        if (elifExpr.getStopLine() != null){
+            throw new ExprException(line.info()+BaseExpr._ELIF+" 表达式["+(elifExpr.getStopLine().lineNum+1)+" - "+(line.lineNum+1)+"]匹配错误");
+        }
         elifExpr.setStopLine(line);
         elifExpr.setBodyStopCol(i-1);
         elifExpr.setStopCol(i-1);
@@ -296,6 +302,10 @@ public class ExprGrammarService {
 
     private void endElse(BinaryExpr binaryExpr, Line line, int i) {
         ElseExpr elseExpr = binaryExpr.elseExpr.get();
+        if (elseExpr.getStopCol() != null){
+            throw new ExprException(line.info()+BaseExpr._ELSE+" 表达式["+(elseExpr.getStopLine().lineNum+1)+" - "+(line.lineNum+1)+"]匹配错误");
+        }
+
         elseExpr.setStopLine(line);
         elseExpr.setBodyStopCol(i-1);
         elseExpr.setStopCol(i+BaseExpr.ENDIF.length());

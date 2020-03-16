@@ -66,4 +66,16 @@ public class GrammarTest extends BaseTest {
 
         Assert.assertThrows(ExprException.class, () -> exprGrammarService.parse(text, true));
     }
+
+    @Test
+    public void test(){
+        String str = "$if 1 $then\n" +
+                "1\n" +
+                "$else if 0\n" +
+                "2\n" +
+                "$else\n" +
+                "3\n" +
+                "$endif";
+        Assert.assertThrows(ExprException.class, () -> exprGrammarService.parse(str, true));
+    }
 }

@@ -1,6 +1,7 @@
 package com.wjs.expr.exprNative;
 
 import com.wjs.expr.ExprException;
+import com.wjs.expr.ExprFunction;
 import com.wjs.expr.bean.BaseExpr;
 
 /**
@@ -85,11 +86,65 @@ public class SqlExprNativeService implements ExprNativeService {
             }
             sb.append(c);
         }
-        return sb.toString();
+        return escapeFunc(sb);
+    }
+
+    /**
+     *  '$func(args)' ->  str($func(args))
+     *  "$func(args)" ->  str($func(args))
+     *
+     * @param sb
+     * @return
+     */
+    public static String escapeFunc(StringBuilder sb){
+        int len = sb.length();
+        if (len < 3){
+            return sb.toString();
+        }
+        StringBuilder str = new StringBuilder(sb.length());
+        str.append(sb.charAt(0));
+        Character pre = null;
+        Character cur = null;
+        int index = -1;
+        boolean found = false;
+        for (int i=1; i<len; i++){
+            pre = sb.charAt(i-1);
+            cur = sb.charAt(i);
+            found = false;
+            if (cur == '$' && (pre == '"' || pre == '\'')){
+                index = i;
+                int left = sb.indexOf("(", index+1);
+                if (left != -1){
+                    int right = sb.indexOf(")", index+1);
+                    if (right > left && right < len-1 && sb.charAt(right+1) == pre){
+                        String funName = sb.substring(index, left);
+                        if (ExprFunction.support(funName)){
+                            str.deleteCharAt(str.length()-1);
+                            str.append("str(").append(sb, index, right+1).append(')');
+                            i = right+1;
+                            found = true;
+                        }
+                    }
+                }
+            }
+            if (!found){
+                str.append(cur);
+            }
+        }
+        return str.toString();
     }
 
     @Override
     public boolean isSplitChar(Character c) {
         return c == ' ' || c == '\n' || c == '\t' || c == BaseExpr.GRAMMAR || c == ',' || c == ';' || c == '(' || c == ')' || c == '=' || c == '}' || c == '{';
+    }
+
+    public static void main(String[] args) {
+//        StringBuilder sb = new StringBuilder("sss11");
+//        System.out.println(escapeFunc(sb));
+//        sb = new StringBuilder("$dfd()=''");
+//        System.out.println(escapeFunc(sb));
+        StringBuilder sb = new StringBuilder("'$dfd()' == '' and   32='$dfd(ddd)'");
+        System.out.println(escapeFunc(sb));
     }
 }

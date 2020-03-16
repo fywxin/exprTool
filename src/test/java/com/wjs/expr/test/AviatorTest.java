@@ -39,6 +39,19 @@ public class AviatorTest extends BaseTest {
     }
 
     @Test
+    public void testEmptyStr() {
+        run("''==''");
+    }
+
+    @Test
+    public void toStringFunc(){
+        //run("str(null) == '5'");
+        run("str(5) == '5'");
+        //run("str(5) == 5");
+        run("str('5') == '5'");
+    }
+
+    @Test
     public void testLine(){
         Assert.assertThrows(ExpressionSyntaxErrorException.class, () -> run("\"1\\n2\"!=\"1\\n2\""));
         Assert.assertThrows(ExprException.class, () ->run ("'1\n3'!='2'"));
