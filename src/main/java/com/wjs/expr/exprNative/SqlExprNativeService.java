@@ -135,7 +135,7 @@ public class SqlExprNativeService implements ExprNativeService {
     }
 
     @Override
-    public boolean isSplitChar(Character c) {
+    public boolean test(Character c) {
         return c == ' ' || c == '\n' || c == '\t' || c == BaseExpr.GRAMMAR || c == ',' || c == ';' || c == '(' || c == ')' || c == '=' || c == '}' || c == '{';
     }
 

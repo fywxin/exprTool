@@ -82,4 +82,13 @@ public class ExprFuncTest extends BaseTest {
         System.out.println(rs);
         Assert.assertTrue("a null b true".equals(rs));
     }
+
+    @Test
+    public void testNoFunc(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", 1);
+        String sql ="$if !$isNull(a) $then null $else a $endif b $isNull(a)";
+        String rs = this.exprService.eval(sql, map);
+        System.out.println(rs);
+    }
 }

@@ -1,11 +1,11 @@
 package com.wjs.expr;
 
 import com.wjs.expr.bean.*;
-import com.wjs.expr.exprNative.CharSpitPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * 表达式语法解析器
@@ -18,7 +18,7 @@ import java.util.Optional;
  **/
 public class ExprGrammarService {
 
-    public CharSpitPredicate charSpitPredicate;
+    public Predicate<Character> charSpitPredicate;
 
     /**
      * 语法解析提取
@@ -346,7 +346,7 @@ public class ExprGrammarService {
      * @return
      */
     public boolean isSplitChar(Character c){
-        return charSpitPredicate.isSplitChar(c);
+        return charSpitPredicate.test(c);
     }
 
 }

@@ -1,10 +1,10 @@
 package com.wjs.expr.commons;
 
 import com.wjs.expr.ExprManager;
-import com.wjs.expr.exprNative.CharSpitPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author wjs
@@ -105,23 +105,23 @@ public class ExprUtil {
      *  获取前N个单词
      * @param sql
      * @param n
-     * @param charSpitPredicate 单词识别
+     * @param predicate 单词识别
      * @return
      */
-    public static List<Tuple2<String, Integer>> headWordN(String sql, int n, CharSpitPredicate charSpitPredicate){
+    public static List<Tuple2<String, Integer>> headWordN(String sql, int n, Predicate<Character> predicate){
         Character c = null;
         List<Tuple2<String, Integer>> words = new ArrayList<>(n);
         int wc = -1;
         for (int i=0; i<sql.length(); i++){
             c = sql.charAt(i);
             if (wc == -1){
-                if (charSpitPredicate.isSplitChar(c)){
+                if (predicate.test(c)){
                     continue;
                 }else{
                     wc = i;
                 }
             }else{
-                if (charSpitPredicate.isSplitChar(c)){
+                if (predicate.test(c)){
                     words.add(new Tuple2<>(sql.substring(wc, i), wc));
                     if (words.size() >= n){
                         return words;
@@ -152,10 +152,10 @@ public class ExprUtil {
      *
      * @param sql
      * @param n
-     * @param charSpitPredicate
+     * @param predicate
      * @return
      */
-    public static List<Tuple2<String, Integer>> tailWordN(String sql, int n, CharSpitPredicate charSpitPredicate){
+    public static List<Tuple2<String, Integer>> tailWordN(String sql, int n, Predicate<Character> predicate){
         Character c = null;
         List<Tuple2<String, Integer>> words = new ArrayList<>(n);
         int wc = -1;
@@ -163,13 +163,13 @@ public class ExprUtil {
         for (int i=len-1; i>=0; i--){
             c = sql.charAt(i);
             if (wc == -1){
-                if (charSpitPredicate.isSplitChar(c)){
+                if (predicate.test(c)){
                     continue;
                 }else{
                     wc = i;
                 }
             }else{
-                if (charSpitPredicate.isSplitChar(c)){
+                if (predicate.test(c)){
                     words.add(new Tuple2<>(sql.substring(i+1, wc+1), i+1));
                     if (words.size() >= n){
                         return words;
