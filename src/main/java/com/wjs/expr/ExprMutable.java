@@ -1,5 +1,7 @@
 package com.wjs.expr;
 
+import com.wjs.expr.bean.FuncExpr;
+
 /**
  * 是否直接结果可变, 如果条件触发了变更，则需要重新执行一遍模板引擎
  * @author wjs
@@ -8,9 +10,9 @@ package com.wjs.expr;
 public interface ExprMutable {
 
     /**
-     * 是否发生了变更
-     * @param args
+     * 决定因子
+     * @param funcExpr
      * @return
      */
-    boolean mutable(Object[] args);
+    String mutableFactor(FuncExpr funcExpr);
 }

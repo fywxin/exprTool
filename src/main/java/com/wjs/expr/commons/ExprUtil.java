@@ -12,6 +12,8 @@ import java.util.function.Predicate;
  **/
 public class ExprUtil {
 
+    public static char[] WS = new char[]{' ', '\r', '\n', '\t'};
+
     public static void fillLine(StringBuilder sb, Integer count){
         while (count > 0){
             sb.append("\n");
@@ -136,6 +138,21 @@ public class ExprUtil {
             words.add(new Tuple2<>(sql.substring(wc), wc));
         }
         return words;
+    }
+
+    public static void rtrim(StringBuilder sb){
+        while (sb.length() > 0 && isWS(sb.charAt(sb.length() - 1))){
+            sb.deleteCharAt(sb.length()-1);
+        }
+    }
+
+    public static boolean isWS(char c) {
+        for (char c1 : WS){
+            if (c == c1){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
