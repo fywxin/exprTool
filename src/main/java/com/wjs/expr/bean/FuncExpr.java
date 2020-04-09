@@ -39,7 +39,7 @@ public class FuncExpr extends SectionExpr {
      * @return
      */
     public String getFuncName(){
-        return text.substring(startCol, text.indexOf('(', startCol)).trim();
+        return ExprUtil.rtrim(text.substring(startCol, text.indexOf('(', startCol)));
     }
 
     /**

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,8 @@ public class ExprTree {
     public List<BinaryExpr> binaryExprList;
 
     public List<FuncExpr> funcExprList;
+
+    public Map<String, FuncExpr> funcExprMap;
 
     public List<SectionExpr> sectionExprList;
 
@@ -51,6 +54,7 @@ public class ExprTree {
         this.text = text;
         this.binaryExprList = binaryExprList;
         this.funcExprList = funcExprList;
+        this.funcExprMap = funcExprList.stream().collect(Collectors.toMap(x -> x.getFuncName(), Function.identity()));
         this.sectionExprList = sectionExprList;
         this.forExprList = forExprList;
         this.startCol = startCol;
@@ -165,13 +169,5 @@ public class ExprTree {
         topExprList = null;
         walkIndex = 0;
         params = null;
-    }
-
-    /**
-     * 是否只是原始字符
-     * @return
-     */
-    public boolean isRaw(){
-        return this.binaryExprList.isEmpty() && this.forExprList.isEmpty() && this.funcExprList.isEmpty() && this.sectionExprList.isEmpty();
     }
 }

@@ -1,6 +1,7 @@
 package com.wjs.expr.commons;
 
 import com.wjs.expr.ExprManager;
+import org.nutz.lang.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,6 +139,18 @@ public class ExprUtil {
             words.add(new Tuple2<>(sql.substring(wc), wc));
         }
         return words;
+    }
+
+    public static String rtrim(String sql){
+        if (Strings.isBlank(sql)){
+            return "";
+        }
+        for (int i=sql.length()-1; i>=0; i--){
+            if (!isWS(sql.charAt(i))){
+                return sql.substring(0, i+1);
+            }
+        }
+        return "";
     }
 
     public static void rtrim(StringBuilder sb){
