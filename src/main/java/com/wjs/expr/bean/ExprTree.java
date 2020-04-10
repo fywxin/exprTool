@@ -54,7 +54,7 @@ public class ExprTree {
         this.text = text;
         this.binaryExprList = binaryExprList;
         this.funcExprList = funcExprList;
-        this.funcExprMap = funcExprList.stream().collect(Collectors.toMap(x -> x.getFuncName(), Function.identity()));
+        this.funcExprMap = funcExprList.stream().filter(x -> !x.getFuncName().startsWith(BaseExpr.INNER_SYMBOL)).collect(Collectors.toMap(x -> x.getFuncName(), Function.identity()));
         this.sectionExprList = sectionExprList;
         this.forExprList = forExprList;
         this.startCol = startCol;
